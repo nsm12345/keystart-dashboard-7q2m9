@@ -62,6 +62,7 @@
   .lightbox img{max-width:96%;max-height:92%;border-radius:10px}
   footer{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--grey);font-size:11.5px;padding:22px}
   .nmono{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2E6BE6,#22B8A6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px}
+  .nlogo{height:22px;width:auto;display:block;opacity:.9}
   @media(max-width:620px){.form{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -109,10 +110,11 @@
       <div class="full" style="display:flex;align-items:center;gap:9px"><input type="checkbox" id="fPost" style="width:auto" checked><label for="fPost" style="margin:0">Customer is happy for photos to be used on social media</label></div>
     </div>
     <div class="row-actions">
-      <button class="btn" onclick="saveJob()">✓ Save job</button>
+      <button class="btn" onclick="saveJob()">Save</button>
       <button class="btn sec" onclick="resetForm()">Clear</button>
+      <span id="syncStatus" style="font-size:12px;color:var(--grey);align-self:center"></span>
     </div>
-    <p class="hint">Jobs are saved on this device automatically. Use <b>Backup</b> regularly so nothing is lost, and <b>Export CSV</b> to send the list to Noonop for the customer database.</p>
+    <p class="hint">Each job is saved on this device <b>and</b> sent to the shared Job &amp; Customer Log, so Noonop sees it too. Keep <b>Backup</b> and <b>Export CSV</b> as a safety net.</p>
   </div>
 
   <!-- TOOLBAR -->
@@ -127,7 +129,7 @@
   <h2 style="font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--grey);margin:8px 4px 12px">Recorded jobs</h2>
   <div class="jobs" id="list"></div>
 
-  <footer><div class="nmono">N</div> Job Tracker by Noonop Studios · for Keystart Auto Locksmiths</footer>
+  <footer><img class="nlogo" src="noonop-logo.png" alt="Noonop Studios"> Job Tracker by Noonop Studios · for Keystart Auto Locksmiths</footer>
 </div>
 <div class="lightbox" id="lightbox" onclick="this.style.display='none'"><img id="lbImg" src=""></div>
 
@@ -135,6 +137,51 @@
 const KEY='keystart_jobs_v1';
 let jobs=JSON.parse(localStorage.getItem(KEY)||'[]');
 let pending=[]; // images for the job being added (data URLs)
+
+/* ===== SHARED-LOG SYNC (Google Form -> shared "Job & Customer Log" Sheet) =====
+   Every saved job is also sent to the Google Form, which writes a row into the
+   shared Sheet that Noonop can see (and export to Excel anytime).
+   ONE-TIME SETUP: paste the entry IDs from the form's "Get pre-filled link"
+   in place of the entry.XXXXXXXX values below. Until then, jobs still save
+   normally on the device and the status simply reads "Saved on this device". */
+const FORM_SYNC = {
+  action: 'https://docs.google.com/forms/d/e/1FAIpQLSeDT1B9gWOnZGIiO2V_wua_bFXdfdZAjWp_wxopbw7bwYoAJQ/formResponse',
+  fields: {
+    date:    'entry.838769463',   // Date of job
+    name:    'entry.1124276802',  // Customer name
+    phone:   'entry.576344779',   // Phone
+    town:    'entry.528997773',   // Town
+    price:   'entry.15094271',    // Price (£)
+    service: 'entry.32483585',    // Service
+    paid:    'entry.1163812397',  // Paid?
+    source:  'entry.1960345618',  // How did they find us?
+    notes:   'entry.545795466'    // Job notes (Vehicle + photo-permission folded in)
+  }
+};
+function setSync(t){const el=document.getElementById('syncStatus');if(el)el.textContent=t;}
+function syncToForm(job){
+  const F=FORM_SYNC;
+  if(!F.action || F.action.indexOf('XXXX')>-1){setSync('Saved on this device');return;}
+  const extra=[];
+  if(job.vehicle) extra.push('Vehicle: '+job.vehicle);
+  extra.push('Photos OK to post: '+(job.okPost?'Yes':'No'));
+  const notesFull=[job.notes,extra.join(' · ')].filter(Boolean).join(' · ');
+  const val={name:job.name,phone:job.phone,town:job.town,price:job.price,service:job.service,
+    paid:job.paid,source:job.source,notes:notesFull};
+  const p=new URLSearchParams();
+  if(F.fields.date && F.fields.date.indexOf('XXXX')===-1 && job.date){
+    const parts=job.date.split('-');
+    p.append(F.fields.date+'_year',parts[0]);
+    p.append(F.fields.date+'_month',String(+parts[1]));
+    p.append(F.fields.date+'_day',String(+parts[2]));
+  }
+  for(const k in val){const id=F.fields[k];
+    if(id && id.indexOf('XXXX')===-1 && val[k]!=null && val[k]!=='') p.append(id,val[k]);}
+  setSync('Sending to shared log…');
+  fetch(F.action,{method:'POST',mode:'no-cors',body:p})
+    .then(()=>setSync('✓ Saved & sent to the shared log'))
+    .catch(()=>setSync('Saved here — could not reach the shared log just now'));
+}
 
 function nowParts(){const d=new Date();const pad=n=>String(n).padStart(2,'0');
   return {date:d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),time:pad(d.getHours())+':'+pad(d.getMinutes())};}
@@ -175,7 +222,7 @@ function saveJob(){
   const job={id:nextId(),date:fDate.value,time:fTime.value,name:fName.value.trim(),phone:fPhone.value.trim(),
     vehicle:fVehicle.value.trim(),town:fTown.value.trim(),service:fService.value,price:fPrice.value,
     paid:fPaid.value,source:fSource.value,notes:fNotes.value.trim(),okPost:fPost.checked,photos:pending.slice()};
-  jobs.unshift(job); persist(); resetForm(); render();
+  jobs.unshift(job); persist(); render(); syncToForm(job); resetForm();
 }
 function persist(){
   try{localStorage.setItem(KEY,JSON.stringify(jobs));}
