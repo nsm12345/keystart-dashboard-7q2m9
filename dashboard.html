@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Keystart — Performance Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#0d1017;--panel:#161b22;--panel2:#1b212b;--border:#262c36;--text:#e6edf3;--muted:#8b949e;
     --green:#3fb950;--amber:#d29922;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff;--teal:#39c5cf;--grid:#21262d;}
@@ -53,6 +54,7 @@
   @media(max-width:1000px){.r6{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(2,1fr)}.r3,.r2,.r2b{grid-template-columns:1fr}}
   @media(max-width:560px){.r6{grid-template-columns:repeat(2,1fr)}}
   @media print{body{background:#fff;color:#111}.panel{break-inside:avoid}.btn,.mnav{display:none}}
+.ncursive{font-family:"Great Vibes",cursive;line-height:.85}.ncsub{font-family:Georgia,"Times New Roman",serif;text-transform:uppercase;letter-spacing:.32em}.nlock{display:inline-flex;flex-direction:column}
 </style>
 </head>
 <body>
@@ -65,7 +67,7 @@
         <button class="yr" id="ytd">Year to date</button></div>
       <label class="btn" style="cursor:pointer">⤓ Data<input type="file" id="file" accept=".csv" style="display:none"></label>
       <button class="btn" onclick="window.print()">⬇ PDF</button>
-      <div class="nlogo"><div class="nmark">n</div><div><div class="t">By</div><div class="w">NOONOP STUDIOS</div></div></div>
+      <div class="nlogo"><span class="t" style="margin-right:7px">By</span><span class="nlock"><span class="ncursive" style="font-size:27px;color:#fff">Noonop</span><span class="ncsub" style="font-size:7px;color:var(--muted);margin-top:-2px">Studios</span></span></div>
     </div>
   </div>
 
@@ -108,7 +110,7 @@
 
   <footer>
     <div style="display:flex;align-items:center;gap:9px"><div class="nmark" style="width:24px;height:24px;font-size:12px">n</div>
-      <span><b style="color:var(--text)">Noonop Studios</b> · bespoke digital experiences that elevate your brand</span></div>
+      <span><span class="ncursive" style="font-size:23px;color:var(--text)">Noonop</span> <span class="ncsub" style="font-size:8px;color:var(--muted)">Studios</span> · bespoke digital experiences that elevate your brand</span></div>
     <span>info@noonopstudios.com · Prepared for Keystart Auto Locksmiths</span>
   </footer>
 </div>

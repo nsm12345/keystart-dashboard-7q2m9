@@ -212,7 +212,7 @@ function exportCSV(){
   const head=['Job ID','Date','Time','Customer','Phone','Vehicle','Town','Service','Notes','Price','Paid','Found us via','OK to post','Photos','Review asked'];
   const rows=jobs.map(j=>[j.id,j.date,j.time,j.name,j.phone,j.vehicle,j.town,j.service,j.notes,j.price,j.paid,j.source,j.okPost?'Yes':'No',(j.photos||[]).length,''] );
   const csv=[head,...rows].map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  dl(new Blob([csv],{type:'text/csv'}),'keystart-jobs-'+today()+'.csv');
+  dl(new Blob([csv],{type:'text/csv'}),'Keystart-Jobs-'+new Date().toISOString().slice(0,7)+'.csv');
 }
 function backup(){dl(new Blob([JSON.stringify(jobs)],{type:'application/json'}),'keystart-jobs-backup-'+today()+'.json');}
 function restore(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();
@@ -221,6 +221,38 @@ function restore(ev){const f=ev.target.files[0];if(!f)return;const r=new FileRea
     catch(err){alert('That file could not be read.');}};r.readAsText(f);}
 function today(){return new Date().toISOString().slice(0,10);}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+
+
+// ===== monthly auto-save to a folder (desktop Chrome/Edge) =====
+const FS_OK = ('showDirectoryPicker' in window);
+let dirHandle=null;
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('ksjt',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function idbSet(k,v){const db=await idb();return new Promise(r=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>r();});}
+async function idbGet(k){const db=await idb();return new Promise(r=>{const t=db.transaction('kv','readonly');const q=t.objectStore('kv').get(k);q.onsuccess=()=>r(q.result);});}
+function toCSV(arr){const head=['Job ID','Date','Time','Customer','Phone','Vehicle','Town','Service','Notes','Price','Paid','Found us via','OK to post','Photos','Review asked'];
+  const rows=arr.map(j=>[j.id,j.date,j.time,j.name,j.phone,j.vehicle,j.town,j.service,j.notes,j.price,j.paid,j.source,j.okPost?'Yes':'No',(j.photos||[]).length,'']);
+  return [head,...rows].map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');}
+function setFolderStatus(t){const el=document.getElementById('folderStatus');if(el)el.textContent=t;}
+async function saveToFolder(){
+  if(!dirHandle)return;
+  try{
+    if((await dirHandle.queryPermission({mode:'readwrite'}))!=='granted'){if((await dirHandle.requestPermission({mode:'readwrite'}))!=='granted'){setFolderStatus('Permission needed — click the folder button');return;}}
+    const groups={};jobs.forEach(j=>{const m=(j.date||'').slice(0,7)||'undated';(groups[m]=groups[m]||[]).push(j);});
+    for(const m in groups){const fh=await dirHandle.getFileHandle('Keystart-Jobs-'+m+'.csv',{create:true});const w=await fh.createWritable();await w.write(toCSV(groups[m]));await w.close();}
+    const all=await dirHandle.getFileHandle('Keystart-Jobs-ALL.csv',{create:true});const wa=await all.createWritable();await wa.write(toCSV(jobs));await wa.close();
+    setFolderStatus('✓ Saved to '+dirHandle.name+' · '+new Date().toLocaleTimeString());
+  }catch(e){setFolderStatus('Save error — try the folder button again');}
+}
+async function chooseFolder(){
+  if(!FS_OK){alert('Auto-save to a folder works in Chrome or Edge on a computer. On a phone, use Export CSV each month instead.');return;}
+  try{dirHandle=await window.showDirectoryPicker({mode:'readwrite'});await idbSet('dir',dirHandle);setFolderStatus('Folder set: '+dirHandle.name);await saveToFolder();}catch(e){}
+}
+(function(){const bar=document.createElement('div');bar.style.cssText='display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 14px';
+  bar.innerHTML='<button class="btn sec" id="folderBtn">📁 Auto-save to a monthly folder</button><span id="folderStatus" style="font-size:11.5px;color:var(--muted)">'+(FS_OK?'Not set — once set, every job auto-saves to a dated monthly file (Keystart-Jobs-YYYY-MM.csv)':'On a phone: use Export CSV each month')+'</span>';
+  const app=document.querySelector('.app');const fc=app.querySelector('.card');app.insertBefore(bar,fc?fc.nextSibling:app.firstChild.nextSibling);
+  document.getElementById('folderBtn').onclick=chooseFolder;})();
+(async()=>{if(!FS_OK)return;try{const hdl=await idbGet('dir');if(hdl){dirHandle=hdl;const p=await hdl.queryPermission({mode:'readwrite'});setFolderStatus(p==='granted'?('Folder: '+hdl.name+' · auto-saving on'):('Folder set — click the button to re-enable: '+hdl.name));}}catch(e){}})();
+persist=(function(orig){return function(){orig.apply(this,arguments);saveToFolder();};})(persist);
 
 resetForm(); render();
 </script>
