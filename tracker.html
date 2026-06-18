@@ -139,12 +139,10 @@ let pending=[]; // images for the job being added (data URLs)
 const SHEET_API = 'https://script.google.com/macros/s/AKfycbwZrTx-PYIHD38irX7XobNdBDVlObD_-H06W6rMwIwe6z-d2M3YTvK-7CvI5gQqAuBJWQ/exec';
 function setSync(t){const el=document.getElementById('syncStatus');if(el)el.textContent=t;}
 function jobParams(job){
-  const extra=[];
-  if(job.vehicle) extra.push('Vehicle: '+job.vehicle);
-  extra.push('Photos OK to post: '+(job.okPost?'Yes':'No'));
-  const notesFull=[job.notes,extra.join(' · ')].filter(Boolean).join(' · ');
+  const notesFull=[job.notes, job.vehicle?('Vehicle: '+job.vehicle):''].filter(Boolean).join(' · ');
   return new URLSearchParams({date:job.date||'',name:job.name||'',phone:job.phone||'',town:job.town||'',
-    price:job.price||'',service:job.service||'',paid:job.paid||'',source:job.source||'',notes:notesFull,time:job.time||''});
+    price:job.price||'',service:job.service||'',paid:job.paid||'',source:job.source||'',notes:notesFull,time:job.time||'',
+    okPost:(job.okPost?'Yes':'No'), photos:JSON.stringify(job.photos||[])});
 }
 function syncToSheet(job){
   setSync('Saving…');
