@@ -114,16 +114,9 @@
       <button class="btn sec" onclick="resetForm()">Clear</button>
       <span id="syncStatus" style="font-size:12px;color:var(--grey);align-self:center"></span>
     </div>
-    <p class="hint">Each job is saved on this device <b>and</b> sent to the shared Job &amp; Customer Log, so Noonop sees it too. Keep <b>Backup</b> and <b>Export CSV</b> as a safety net.</p>
+    <p class="hint">Each job saves to your Job &amp; Customer Log automatically — you’ll see “✓ Saved to your job sheet” when it’s in.</p>
   </div>
 
-  <!-- TOOLBAR -->
-  <div class="row-actions" style="margin-bottom:14px">
-    <button class="btn ghost" onclick="exportCSV()">⬇ Export CSV</button>
-    <button class="btn sec" onclick="backup()">💾 Backup (file)</button>
-    <button class="btn sec" onclick="document.getElementById('restore').click()">↥ Restore</button>
-    <input type="file" id="restore" accept=".json" style="display:none" onchange="restore(event)">
-  </div>
 
   <!-- JOBS LIST -->
   <h2 style="font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--grey);margin:8px 4px 12px">Recorded jobs</h2>
@@ -138,49 +131,34 @@ const KEY='keystart_jobs_v1';
 let jobs=JSON.parse(localStorage.getItem(KEY)||'[]');
 let pending=[]; // images for the job being added (data URLs)
 
-/* ===== SHARED-LOG SYNC (Google Form -> shared "Job & Customer Log" Sheet) =====
-   Every saved job is also sent to the Google Form, which writes a row into the
-   shared Sheet that Noonop can see (and export to Excel anytime).
-   ONE-TIME SETUP: paste the entry IDs from the form's "Get pre-filled link"
-   in place of the entry.XXXXXXXX values below. Until then, jobs still save
-   normally on the device and the status simply reads "Saved on this device". */
-const FORM_SYNC = {
-  action: 'https://docs.google.com/forms/d/e/1FAIpQLSeDT1B9gWOnZGIiO2V_wua_bFXdfdZAjWp_wxopbw7bwYoAJQ/formResponse',
-  fields: {
-    date:    'entry.838769463',   // Date of job
-    name:    'entry.1124276802',  // Customer name
-    phone:   'entry.576344779',   // Phone
-    town:    'entry.528997773',   // Town
-    price:   'entry.15094271',    // Price (£)
-    service: 'entry.32483585',    // Service
-    paid:    'entry.1163812397',  // Paid?
-    source:  'entry.1960345618',  // How did they find us?
-    notes:   'entry.545795466'    // Job notes (Vehicle + photo-permission folded in)
-  }
-};
+/* ===== SAVE DIRECT TO THE SHARED "Job & Customer Log" SHEET =====
+   Each job is POSTed to a Google Apps Script web app bound to the Sheet,
+   which appends a row and replies {ok:true}. We read that reply so the
+   status shows a TRUE confirmation. Any job that does not confirm is kept
+   on the device and re-sent automatically next time the page is opened. */
+const SHEET_API = 'https://script.google.com/macros/s/AKfycbwZrTx-PYIHD38irX7XobNdBDVlObD_-H06W6rMwIwe6z-d2M3YTvK-7CvI5gQqAuBJWQ/exec';
 function setSync(t){const el=document.getElementById('syncStatus');if(el)el.textContent=t;}
-function syncToForm(job){
-  const F=FORM_SYNC;
-  if(!F.action || F.action.indexOf('XXXX')>-1){setSync('Saved on this device');return;}
+function jobParams(job){
   const extra=[];
   if(job.vehicle) extra.push('Vehicle: '+job.vehicle);
   extra.push('Photos OK to post: '+(job.okPost?'Yes':'No'));
   const notesFull=[job.notes,extra.join(' · ')].filter(Boolean).join(' · ');
-  const val={name:job.name,phone:job.phone,town:job.town,price:job.price,service:job.service,
-    paid:job.paid,source:job.source,notes:notesFull};
-  const p=new URLSearchParams();
-  if(F.fields.date && F.fields.date.indexOf('XXXX')===-1 && job.date){
-    const parts=job.date.split('-');
-    p.append(F.fields.date+'_year',parts[0]);
-    p.append(F.fields.date+'_month',String(+parts[1]));
-    p.append(F.fields.date+'_day',String(+parts[2]));
-  }
-  for(const k in val){const id=F.fields[k];
-    if(id && id.indexOf('XXXX')===-1 && val[k]!=null && val[k]!=='') p.append(id,val[k]);}
-  setSync('Sending to shared log…');
-  fetch(F.action,{method:'POST',mode:'no-cors',body:p})
-    .then(()=>setSync('✓ Saved & sent to the shared log'))
-    .catch(()=>setSync('Saved here — could not reach the shared log just now'));
+  return new URLSearchParams({date:job.date||'',name:job.name||'',phone:job.phone||'',town:job.town||'',
+    price:job.price||'',service:job.service||'',paid:job.paid||'',source:job.source||'',notes:notesFull,time:job.time||''});
+}
+function syncToSheet(job){
+  setSync('Saving…');
+  fetch(SHEET_API,{method:'POST',body:jobParams(job)})
+    .then(r=>r.json())
+    .then(d=>{ if(d&&d.ok){ job.synced=true; persist(); setSync('✓ Saved to your job sheet'); }
+               else { setSync('Saved here — will retry automatically'); } })
+    .catch(()=>{ setSync('No internet — saved here, will send when you’re back online'); });
+}
+function resendUnsynced(){
+  jobs.filter(j=>!j.synced).forEach(job=>{
+    fetch(SHEET_API,{method:'POST',body:jobParams(job)})
+      .then(r=>r.json()).then(d=>{ if(d&&d.ok){ job.synced=true; persist(); } }).catch(()=>{});
+  });
 }
 
 function nowParts(){const d=new Date();const pad=n=>String(n).padStart(2,'0');
@@ -222,7 +200,7 @@ function saveJob(){
   const job={id:nextId(),date:fDate.value,time:fTime.value,name:fName.value.trim(),phone:fPhone.value.trim(),
     vehicle:fVehicle.value.trim(),town:fTown.value.trim(),service:fService.value,price:fPrice.value,
     paid:fPaid.value,source:fSource.value,notes:fNotes.value.trim(),okPost:fPost.checked,photos:pending.slice()};
-  jobs.unshift(job); persist(); render(); syncToForm(job); resetForm();
+  jobs.unshift(job); persist(); render(); syncToSheet(job); resetForm();
 }
 function persist(){
   try{localStorage.setItem(KEY,JSON.stringify(jobs));}
@@ -255,53 +233,8 @@ function render(){
 function fmtDate(d){if(!d)return'';const[y,m,da]=d.split('-');const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return da+' '+M[(+m)-1]+' '+y.slice(2);}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-function exportCSV(){
-  const head=['Job ID','Date','Time','Customer','Phone','Vehicle','Town','Service','Notes','Price','Paid','Found us via','OK to post','Photos','Review asked'];
-  const rows=jobs.map(j=>[j.id,j.date,j.time,j.name,j.phone,j.vehicle,j.town,j.service,j.notes,j.price,j.paid,j.source,j.okPost?'Yes':'No',(j.photos||[]).length,''] );
-  const csv=[head,...rows].map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  dl(new Blob([csv],{type:'text/csv'}),'Keystart-Jobs-'+new Date().toISOString().slice(0,7)+'.csv');
-}
-function backup(){dl(new Blob([JSON.stringify(jobs)],{type:'application/json'}),'keystart-jobs-backup-'+today()+'.json');}
-function restore(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=e=>{try{const data=JSON.parse(e.target.result);if(!Array.isArray(data))throw 0;
-    if(confirm('Restore '+data.length+' jobs? This replaces the current list.')){jobs=data;persist();render();}}
-    catch(err){alert('That file could not be read.');}};r.readAsText(f);}
-function today(){return new Date().toISOString().slice(0,10);}
-function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
 
-
-// ===== monthly auto-save to a folder (desktop Chrome/Edge) =====
-const FS_OK = ('showDirectoryPicker' in window);
-let dirHandle=null;
-function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('ksjt',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
-async function idbSet(k,v){const db=await idb();return new Promise(r=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>r();});}
-async function idbGet(k){const db=await idb();return new Promise(r=>{const t=db.transaction('kv','readonly');const q=t.objectStore('kv').get(k);q.onsuccess=()=>r(q.result);});}
-function toCSV(arr){const head=['Job ID','Date','Time','Customer','Phone','Vehicle','Town','Service','Notes','Price','Paid','Found us via','OK to post','Photos','Review asked'];
-  const rows=arr.map(j=>[j.id,j.date,j.time,j.name,j.phone,j.vehicle,j.town,j.service,j.notes,j.price,j.paid,j.source,j.okPost?'Yes':'No',(j.photos||[]).length,'']);
-  return [head,...rows].map(r=>r.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');}
-function setFolderStatus(t){const el=document.getElementById('folderStatus');if(el)el.textContent=t;}
-async function saveToFolder(){
-  if(!dirHandle)return;
-  try{
-    if((await dirHandle.queryPermission({mode:'readwrite'}))!=='granted'){if((await dirHandle.requestPermission({mode:'readwrite'}))!=='granted'){setFolderStatus('Permission needed — click the folder button');return;}}
-    const groups={};jobs.forEach(j=>{const m=(j.date||'').slice(0,7)||'undated';(groups[m]=groups[m]||[]).push(j);});
-    for(const m in groups){const fh=await dirHandle.getFileHandle('Keystart-Jobs-'+m+'.csv',{create:true});const w=await fh.createWritable();await w.write(toCSV(groups[m]));await w.close();}
-    const all=await dirHandle.getFileHandle('Keystart-Jobs-ALL.csv',{create:true});const wa=await all.createWritable();await wa.write(toCSV(jobs));await wa.close();
-    setFolderStatus('✓ Saved to '+dirHandle.name+' · '+new Date().toLocaleTimeString());
-  }catch(e){setFolderStatus('Save error — try the folder button again');}
-}
-async function chooseFolder(){
-  if(!FS_OK){alert('Auto-save to a folder works in Chrome or Edge on a computer. On a phone, use Export CSV each month instead.');return;}
-  try{dirHandle=await window.showDirectoryPicker({mode:'readwrite'});await idbSet('dir',dirHandle);setFolderStatus('Folder set: '+dirHandle.name);await saveToFolder();}catch(e){}
-}
-(function(){const bar=document.createElement('div');bar.style.cssText='display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 14px';
-  bar.innerHTML='<button class="btn sec" id="folderBtn">📁 Auto-save to a monthly folder</button><span id="folderStatus" style="font-size:11.5px;color:var(--muted)">'+(FS_OK?'Not set — once set, every job auto-saves to a dated monthly file (Keystart-Jobs-YYYY-MM.csv)':'On a phone: use Export CSV each month')+'</span>';
-  const app=document.querySelector('.app');const fc=app.querySelector('.card');app.insertBefore(bar,fc?fc.nextSibling:app.firstChild.nextSibling);
-  document.getElementById('folderBtn').onclick=chooseFolder;})();
-(async()=>{if(!FS_OK)return;try{const hdl=await idbGet('dir');if(hdl){dirHandle=hdl;const p=await hdl.queryPermission({mode:'readwrite'});setFolderStatus(p==='granted'?('Folder: '+hdl.name+' · auto-saving on'):('Folder set — click the button to re-enable: '+hdl.name));}}catch(e){}})();
-persist=(function(orig){return function(){orig.apply(this,arguments);saveToFolder();};})(persist);
-
-resetForm(); render();
+resetForm(); render(); resendUnsynced();
 </script>
 </body>
 </html>
