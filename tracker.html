@@ -4,6 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Keystart — Job Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{--navy:#0E1F3A;--navy2:#16315a;--accent:#2E6BE6;--teal:#22B8A6;--amber:#F0A431;--good:#16A34A;--red:#E5484D;
     --grey:#64748B;--line:#E6EBF2;--bg:#EEF2F8;--card:#fff;}
@@ -64,18 +65,22 @@
   .nmono{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2E6BE6,#22B8A6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px}
   .nlogo{height:22px;width:auto;display:block;opacity:.9}
   @media(max-width:620px){.form{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
-  .topnav{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid #e6e9f0;border-radius:12px;padding:9px 12px;margin-bottom:14px;box-shadow:0 1px 3px rgba(14,31,58,.06)}
-  .topnav .navlinks{display:flex;gap:6px;flex-wrap:wrap}
-  .topnav a{text-decoration:none;color:#0E1F3A;font-weight:600;font-size:14px;padding:7px 13px;border-radius:8px}
-  .topnav a:hover{background:#eef2f8}
-  .topnav a.active{background:#2E6BE6;color:#fff}
+  .topnav{display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:rgba(255,255,255,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid #e6ebf2;border-radius:14px;padding:9px 12px 9px 14px;margin:16px 0 14px;position:sticky;top:12px;z-index:40;box-shadow:0 1px 2px rgba(14,31,58,.05),0 10px 26px rgba(14,31,58,.06)}
+  .topnav .kbrand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#0E1F3A;font-weight:800;font-size:14.5px;letter-spacing:-.01em}
+  .topnav .kbrand img{height:28px;width:auto;display:block}
+  .topnav .navlinks{display:flex;gap:4px;flex-wrap:wrap}
+  .topnav .navlinks a{text-decoration:none;color:#5d6b85;font-weight:600;font-size:14px;padding:8px 13px;border-radius:11px;transition:background .15s,color .15s}
+  .topnav .navlinks a:hover{background:#eef2f8;color:#0E1F3A}
+  .topnav .navlinks a.active{background:#0E1F3A;color:#fff}
   .topnav .navbrand{padding:0}
-  .topnav .navbrand img{height:26px;width:auto;display:block}
+  .topnav .navbrand img{height:21px;width:auto;display:block;opacity:.85}
+  @media(max-width:560px){.topnav .kbrand span{display:none}}
 </style>
 </head>
 <body>
 <div class="app">
   <nav class="topnav">
+    <a class="kbrand" href="index.html"><img src="keystart-logo.png" alt="Keystart Auto Locksmiths"><span>Keystart Auto Locksmiths</span></a>
     <div class="navlinks">
       <a href="index.html">Hub</a>
       <a href="tracker.html" class="active">Job Tracker</a>
