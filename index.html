@@ -44,7 +44,7 @@
   .links a:hover{background:#eef2f8; color:var(--ink)}
   .links a.active{background:var(--navy); color:#fff}
   .np{display:flex; align-items:center; padding-left:4px}
-  .np img{height:21px; width:auto; display:block; opacity:.85}
+  .np img{height:32px; width:auto; display:block; opacity:.9}
   @media(max-width:560px){ .brand span{display:none} .links a{padding:8px 11px} }
 
   /* ---------- HERO ---------- */
@@ -68,10 +68,12 @@
     color:#d6ffe9; background:rgba(34,184,166,.18); border:1px solid rgba(34,184,166,.4); padding:5px 11px; border-radius:999px}
   .dot{width:8px; height:8px; border-radius:50%; background:#34e3b6; box-shadow:0 0 0 0 rgba(52,227,182,.6); animation:pulse 2s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,227,182,.5)}70%{box-shadow:0 0 0 7px rgba(52,227,182,0)}100%{box-shadow:0 0 0 0 rgba(52,227,182,0)}}
-  .managed{position:relative; z-index:2; display:flex; align-items:center; gap:12px; margin-top:22px; padding-top:16px;
+  .managed{position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:22px; padding-top:16px;
     border-top:1px solid rgba(255,255,255,.14)}
   .managed .lbl{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#9fb2d6; font-weight:700}
-  .managed img{height:30px; width:auto; display:block}
+  .managed img{height:56px; width:auto; display:block}
+  .managed .pill{margin-top:0}
+  .mby{display:flex; align-items:center; gap:12px}
   @media(max-width:560px){ .hero{padding:24px 20px} .hero-row{gap:14px} .klogo{width:76px;height:76px} .klogo img{width:60px} .htext h1{font-size:23px} }
 
   /* ---------- TOOLS ---------- */
@@ -133,12 +135,11 @@
       <div class="htext">
         <h1>Keystart Auto Locksmiths</h1>
         <p>Your marketing hub - everything in one place.</p>
-        <span class="pill"><span class="dot"></span> Live workspace</span>
       </div>
     </div>
     <div class="managed">
-      <span class="lbl">Managed by</span>
-      <img src="noonop-logo-white.png" alt="Noonop Studios">
+      <span class="pill"><span class="dot"></span> Live workspace</span>
+      <span class="mby"><span class="lbl">Managed by</span><img src="noonop-logo-white.png" alt="Noonop Studios"></span>
     </div>
   </header>
 
@@ -179,21 +180,20 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h5"/></svg>
       </span>
-      <div class="cbody"><h3>Reports</h3><p>Your performance summaries in your shared Drive.</p></div>
+      <div class="cbody"><h3>Reports</h3><p>Your performance summaries, in your shared Drive.</p></div>
       <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       <span class="ext">Drive ↗</span>
     </a>
 
   </div>
 
-  <div class="foot">
-    <div class="fl">
-      <img src="noonop-logo.png" alt="Noonop Studios">
-      <span class="tag">Bespoke digital experiences that elevate your brand.</span>
-    </div>
-    <a class="site" href="https://noonopstudios.com" target="_blank" rel="noopener">noonopstudios.com →</a>
-  </div>
-  <div class="legal">Prepared for Keystart Auto Locksmiths · © 2026 Noonop Studios</div>
+  <footer style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;margin-top:18px;padding:24px 12px;border-top:1px solid #e6ebf2;color:#64748B;font-size:12px;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif">
+    <img src="noonop-logo.png" alt="Noonop Studios" style="height:56px;width:auto;display:block;margin-bottom:4px">
+    <div style="font-style:italic;margin-bottom:12px">Bespoke digital experiences that elevate your brand</div>
+    <div><a href="mailto:info@noonopstudios.com" style="color:inherit;text-decoration:none">info@noonopstudios.com</a> &middot; <a href="https://noonopstudios.com" target="_blank" rel="noopener" style="color:#2E6BE6;text-decoration:none;font-weight:600">noonopstudios.com</a></div>
+    <div>Prepared for Keystart Auto Locksmiths</div>
+    <div style="color:#9aa6b6">&copy; Noonop Studios 2026</div>
+  </footer>
 
 </div>
 </body>
