@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Keystart - Performance Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#0d1017;--panel:#161b22;--panel2:#1b212b;--border:#262c36;--text:#e6edf3;--muted:#8b949e;
@@ -131,18 +132,34 @@ function mk(id,t,d,o){if(charts[id])charts[id].destroy();charts[id]=new Chart(do
 function savePDF(){
  const el=document.querySelector('.wrap');
  const btn=document.getElementById('pdfBtn');
- if(typeof html2pdf!=='function'){ window.print(); return; }
- if(btn){btn.disabled=true;btn.textContent='Preparing PDF...';}
  const done=()=>{ if(btn){btn.disabled=false;btn.textContent='\u2B07 Save as PDF';} };
- // Capture the FULL rendered width (incl. any overflow) so nothing on the sides is clipped.
- const W=Math.max(el.scrollWidth,el.offsetWidth,1024);
- const opt={margin:[6,6,6,6],filename:'Keystart-Performance-Dashboard.pdf',
-   image:{type:'jpeg',quality:0.98},
-   html2canvas:{scale:2,backgroundColor:'#0d1017',useCORS:true,scrollX:0,scrollY:0,windowWidth:W,width:W},
-   jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},
-   pagebreak:{mode:['css','legacy']}};
- try{ html2pdf().set(opt).from(el).save().then(done).catch(function(){done();window.print();}); }
- catch(e){ done(); window.print(); }
+ // Need both libraries; if either failed to load, fall back to the browser print dialog.
+ if(typeof html2canvas!=='function' || !window.jspdf || !window.jspdf.jsPDF){ window.print(); return; }
+ if(btn){btn.disabled=true;btn.textContent='Preparing PDF...';}
+ // Force a full desktop-width render so the multi-column layout is captured exactly as on screen,
+ // never the narrow stacked mobile version, and nothing on the sides is clipped.
+ const W=Math.max(el.scrollWidth,el.offsetWidth,1180);
+ // Give Chart.js a beat to finish painting, then snapshot the whole dashboard to one image.
+ setTimeout(function(){
+   html2canvas(el,{
+     backgroundColor:'#0d1017',
+     scale:2,
+     useCORS:true,
+     windowWidth:W,
+     width:W,
+     scrollX:0,
+     scrollY:-window.scrollY
+   }).then(function(canvas){
+     const jsPDF=window.jspdf.jsPDF;
+     const w=canvas.width, h=canvas.height;
+     // Page is sized to the captured image (single page) => a pixel-perfect copy of the page,
+     // with no A4 re-flow that would change the layout.
+     const pdf=new jsPDF({orientation:(w>=h?'l':'p'),unit:'px',format:[w,h],compress:true});
+     pdf.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,w,h);
+     pdf.save('Keystart-Performance-Dashboard.pdf');
+     done();
+   }).catch(function(){ done(); window.print(); });
+ },350);
 }
 
 const MONTHS=[
@@ -200,7 +217,7 @@ function renderStatic(){
 
 
 document.getElementById('info').innerHTML=[['Business','Keystart Auto Locksmiths'],['Owner','Sole Operator · Mobile'],['Base','Glossop, Derbyshire'],
- ['Coverage','~30 Mi (Derbys/Mcr/Cheshire)'],['Phone','07880 075053'],['Website','keystartautolocksmiths.co.uk'],
+ ['Coverage','~30 Mi (Derbys/Mcr/Cheshire)'],['Phone','+44 7880 075053'],['Website','keystartautolocksmiths.co.uk'],
  ['Facebook','Keystart Auto Locksmiths'],['Instagram','@keystartautolocksmiths'],
  ['Certification','Advanced Van Locks'],['Positioning','Fast. Mobile. Honest.']].map(r=>`<div class="r"><span class="k">${r[0]}</span><span>${r[1]}</span></div>`).join('');
 document.getElementById('services').innerHTML=['Car Lockouts','Lost Keys','Spare Keys','Key Cutting & Coding','Remote Repairs','All Keys Lost','Van Locks','24/7 Availability'].map(s=>`<span>${s}</span>`).join('');
