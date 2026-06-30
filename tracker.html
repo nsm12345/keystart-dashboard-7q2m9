@@ -132,6 +132,7 @@
     <div class="row-actions">
       <button class="btn" onclick="saveJob()">Save</button>
       <button class="btn sec" onclick="resetForm()">Clear</button>
+      <button class="btn ghost" onclick="exportBackup()">Backup</button>
       <span id="syncStatus" style="font-size:12px;color:var(--grey);align-self:center"></span>
     </div>
     <p class="hint">Each job is saved - you’ll see “✓ Saved to your job sheet” once it’s done.</p>
@@ -144,8 +145,8 @@
 
   <footer style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;margin-top:18px;padding:24px 12px;border-top:1px solid #e6ebf2;color:#64748B;font-size:12px;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif">
     <img src="noonop-logo.png" alt="Noonop Studios" style="height:56px;width:auto;display:block;margin-bottom:4px">
-    <div style="font-style:italic;margin-bottom:12px">Bespoke digital experiences that elevate your brand</div>
-    <div><a href="mailto:info@noonopstudios.com" style="color:inherit;text-decoration:none">info@noonopstudios.com</a> &middot; <a href="https://noonopstudios.com" target="_blank" rel="noopener" style="color:#2E6BE6;text-decoration:none;font-weight:600">noonopstudios.com</a></div>
+    <div style="font-style:italic">Bespoke digital experiences that elevate your brand</div>
+    <div style="margin-bottom:12px"><a href="mailto:info@noonopstudios.com" style="color:inherit;text-decoration:none">info@noonopstudios.com</a> &middot; <a href="https://noonopstudios.com" target="_blank" rel="noopener" style="color:#2E6BE6;text-decoration:none;font-weight:600">noonopstudios.com</a></div>
     <div>Prepared for Keystart Auto Locksmiths</div>
     <div style="color:#9aa6b6">&copy; Noonop Studios 2026</div>
   </footer>
@@ -166,23 +167,34 @@ const SHEET_API = 'https://script.google.com/macros/s/AKfycbwZrTx-PYIHD38irX7Xob
 function setSync(t){const el=document.getElementById('syncStatus');if(el)el.textContent=t;}
 function jobParams(job){
   const notesFull=[job.notes, job.vehicle?('Vehicle: '+job.vehicle):''].filter(Boolean).join(' · ');
-  return new URLSearchParams({date:job.date||'',name:job.name||'',phone:job.phone||'',town:job.town||'',
+  return new URLSearchParams({uid:job.uid||'',date:job.date||'',name:job.name||'',phone:job.phone||'',town:job.town||'',
     price:job.price||'',service:job.service||'',paid:job.paid||'',source:job.source||'',notes:notesFull,time:job.time||'',
     okPost:(job.okPost?'Yes':'No'), photos:JSON.stringify(job.photos||[])});
 }
+/* A POST to an Apps Script /exec URL is answered with a 302 redirect whose
+   final response carries no CORS header, so the browser blocks us from
+   reading the body. Reading r.json() therefore threw on EVERY save - even
+   the ones that worked - so jobs were wrongly marked unsynced and re-sent on
+   each reopen. We now send with mode:'no-cors' (the row is still appended)
+   and confirm once the request completes. Every job carries a unique uid so
+   the Sheet script can ignore a duplicate if one is ever sent twice. */
 function syncToSheet(job){
   setSync('Saving…');
-  fetch(SHEET_API,{method:'POST',body:jobParams(job)})
-    .then(r=>r.json())
-    .then(d=>{ if(d&&d.ok){ job.synced=true; persist(); setSync('✓ Saved to your job sheet'); }
-               else { setSync('Saved here - will retry automatically'); } })
+  fetch(SHEET_API,{method:'POST',mode:'no-cors',body:jobParams(job)})
+    .then(()=>{ job.synced=true; persist(); setSync('✓ Saved to your job sheet'); })
     .catch(()=>{ setSync('No internet - saved here, will send when you’re back online'); });
 }
+let _resending=false;
 function resendUnsynced(){
-  jobs.filter(j=>!j.synced).forEach(job=>{
-    fetch(SHEET_API,{method:'POST',body:jobParams(job)})
-      .then(r=>r.json()).then(d=>{ if(d&&d.ok){ job.synced=true; persist(); } }).catch(()=>{});
-  });
+  if(_resending)return;
+  const queue=jobs.filter(j=>!j.synced);
+  if(!queue.length)return;
+  _resending=true;
+  Promise.all(queue.map(job=>
+    fetch(SHEET_API,{method:'POST',mode:'no-cors',body:jobParams(job)})
+      .then(()=>{ job.synced=true; }).catch(()=>{})
+  )).then(()=>{ persist(); render(); _resending=false; })
+    .catch(()=>{ _resending=false; });
 }
 
 function nowParts(){const d=new Date();const pad=n=>String(n).padStart(2,'0');
@@ -221,14 +233,41 @@ drop.addEventListener('drop',e=>{e.preventDefault();drop.style.borderColor='';ad
 
 function saveJob(){
   if(!fDate.value){alert('Please set a date.');return;}
-  const job={id:nextId(),date:fDate.value,time:fTime.value,name:fName.value.trim(),phone:fPhone.value.trim(),
+  const job={uid:'KS'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    id:nextId(),date:fDate.value,time:fTime.value,name:fName.value.trim(),phone:fPhone.value.trim(),
     vehicle:fVehicle.value.trim(),town:fTown.value.trim(),service:fService.value,price:fPrice.value,
-    paid:fPaid.value,source:fSource.value,notes:fNotes.value.trim(),okPost:fPost.checked,photos:pending.slice()};
+    paid:fPaid.value,source:fSource.value,notes:fNotes.value.trim(),okPost:fPost.checked,
+    photos:pending.slice(),photoCount:pending.length};
   jobs.unshift(job); persist(); render(); syncToSheet(job); resetForm();
 }
+/* Photos are kept on the device only until the job reaches the sheet, where
+   the photos themselves are saved to the Google Drive folder. To keep the
+   tracker usable forever without running out of browser storage, if storage
+   ever fills we drop the heavy photo data from the OLDEST already-saved jobs
+   first (those photos are safe in Drive) - the job records always stay. */
 function persist(){
-  try{localStorage.setItem(KEY,JSON.stringify(jobs));}
-  catch(e){alert('Storage is getting full - please Backup to a file, then it’s safe to keep going.');}
+  try{ localStorage.setItem(KEY,JSON.stringify(jobs)); return; }
+  catch(e){
+    const synced=jobs.filter(j=>j.synced&&j.photos&&j.photos.length); // newest-first order
+    for(let i=synced.length-1;i>=0;i--){ // start from the oldest saved job
+      synced[i].photos=[];
+      try{ localStorage.setItem(KEY,JSON.stringify(jobs)); return; }catch(_){}
+    }
+    jobs.forEach(j=>{ if(j.photos) j.photos=[]; }); // last resort: keep records, drop photos
+    try{ localStorage.setItem(KEY,JSON.stringify(jobs)); }
+    catch(_){ alert('Storage is full. Please tap Backup to save a copy, then delete a few old jobs.'); }
+  }
+}
+function exportBackup(){
+  try{
+    const blob=new Blob([JSON.stringify(jobs,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='keystart-jobs-backup-'+todayStr()+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    setSync('✓ Backup saved to your device');
+  }catch(e){ alert('Could not create the backup file.'); }
 }
 function delJob(id){if(confirm('Delete this job?')){jobs=jobs.filter(j=>j.id!==id);persist();render();}}
 function show(src){lbImg.src=src;lightbox.style.display='flex';}
@@ -245,12 +284,13 @@ function render(){
   L.innerHTML=jobs.map(j=>{
     const when=fmtDate(j.date)+(j.time?' · '+j.time:'');
     const photos=(j.photos||[]).map(p=>`<img src="${p}" onclick="show('${'_'}');" data-s="${p}">`).join('');
+    const photoNote=(!photos&&j.photoCount)?`<div class="jt" style="color:var(--grey);font-size:12px;align-items:center">📷 ${j.photoCount} photo${j.photoCount>1?'s':''} saved to Drive</div>`:'';
     return `<div class="job"><div class="top"><div>
       <div class="id">${j.id}</div><h3>${j.service}${j.name?' - '+esc(j.name):''}</h3>
       <div class="meta">${[j.vehicle,j.town].filter(Boolean).map(esc).join(' · ')||'&nbsp;'}${j.notes?'<br>'+esc(j.notes):''}</div>
       <div style="margin-top:8px">${j.price?`<span class="pill pgreen">£${esc(j.price)}</span>`:''}<span class="pill pamber">${esc(j.paid||'')}</span><span class="pill pblue">${esc(j.source||'')}</span>${j.okPost?'<span class="pill pgreen">OK to post</span>':'<span class="pill pamber">no posting</span>'}</div>
       </div><div style="text-align:right"><div class="when">${when}</div><button class="del" onclick="delJob('${j.id}')">Delete</button></div></div>
-      ${photos?`<div class="jt">${photos}</div>`:''}</div>`;
+      ${photos?`<div class="jt">${photos}</div>`:photoNote}</div>`;
   }).join('');
   // bind image clicks (avoids quote issues)
   document.querySelectorAll('.job .jt img').forEach(im=>im.onclick=()=>show(im.dataset.s));
@@ -260,10 +300,17 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 
 
 resetForm(); render(); resendUnsynced();
-/* Keep the Today figure correct: roll over at midnight and refresh whenever the tracker is reopened or refocused. */
+/* Keep the figures correct each day: refresh exactly at midnight (local time),
+   and also whenever the tracker is reopened or refocused. */
 let _trackDay=todayStr();
-function refreshDay(){ if(todayStr()!==_trackDay){ _trackDay=todayStr(); render(); } }
-setInterval(refreshDay,30000);
+function refreshDay(){ if(todayStr()!==_trackDay){ _trackDay=todayStr(); render(); resendUnsynced(); } }
+function scheduleMidnight(){
+  const now=new Date();
+  const nextMidnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,2); // 2s after midnight
+  setTimeout(function(){ _trackDay=todayStr(); render(); resendUnsynced(); scheduleMidnight(); }, nextMidnight-now);
+}
+scheduleMidnight();
+setInterval(refreshDay,30000); // safety net if the tab was asleep at midnight
 document.addEventListener('visibilitychange',function(){ if(!document.hidden){ refreshDay(); render(); resendUnsynced(); } });
 window.addEventListener('focus',refreshDay);
 </script>

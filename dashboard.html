@@ -112,8 +112,8 @@
 
   <footer style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;margin-top:18px;padding:24px 12px;border-top:1px solid #e6ebf2;color:#64748B;font-size:12px;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif">
     <img src="noonop-logo-white.png" alt="Noonop Studios" style="height:56px;width:auto;display:block;margin-bottom:4px">
-    <div style="font-style:italic;margin-bottom:12px">Bespoke digital experiences that elevate your brand</div>
-    <div><a href="mailto:info@noonopstudios.com" style="color:inherit;text-decoration:none">info@noonopstudios.com</a> &middot; <a href="https://noonopstudios.com" target="_blank" rel="noopener" style="color:#2E6BE6;text-decoration:none;font-weight:600">noonopstudios.com</a></div>
+    <div style="font-style:italic">Bespoke digital experiences that elevate your brand</div>
+    <div style="margin-bottom:12px"><a href="mailto:info@noonopstudios.com" style="color:inherit;text-decoration:none">info@noonopstudios.com</a> &middot; <a href="https://noonopstudios.com" target="_blank" rel="noopener" style="color:#2E6BE6;text-decoration:none;font-weight:600">noonopstudios.com</a></div>
     <div>Prepared for Keystart Auto Locksmiths</div>
     <div style="color:#9aa6b6">&copy; Noonop Studios 2026</div>
   </footer>
@@ -134,9 +134,11 @@ function savePDF(){
  if(typeof html2pdf!=='function'){ window.print(); return; }
  if(btn){btn.disabled=true;btn.textContent='Preparing PDF...';}
  const done=()=>{ if(btn){btn.disabled=false;btn.textContent='\u2B07 Save as PDF';} };
- const opt={margin:6,filename:'Keystart-Performance-Dashboard.pdf',
+ // Capture the FULL rendered width (incl. any overflow) so nothing on the sides is clipped.
+ const W=Math.max(el.scrollWidth,el.offsetWidth,1024);
+ const opt={margin:[6,6,6,6],filename:'Keystart-Performance-Dashboard.pdf',
    image:{type:'jpeg',quality:0.98},
-   html2canvas:{scale:2,backgroundColor:'#0d1017',useCORS:true,windowWidth:1280},
+   html2canvas:{scale:2,backgroundColor:'#0d1017',useCORS:true,scrollX:0,scrollY:0,windowWidth:W,width:W},
    jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},
    pagebreak:{mode:['css','legacy']}};
  try{ html2pdf().set(opt).from(el).save().then(done).catch(function(){done();window.print();}); }
