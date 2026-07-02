@@ -120,6 +120,7 @@
         <option>Car Lockout</option><option>Spare Key</option><option>Lost All keys</option><option>Key Cutting</option>
         <option>Key Programming</option><option>Remote Repair</option><option>Van Locks</option><option>Ignition Repair</option><option>Other</option></select></div>
       <div><label>Price (£)</label><input id="fPrice" type="number" inputmode="decimal" placeholder="120"></div>
+      <div><label>Expense (£)</label><input id="fExpense" type="number" inputmode="decimal" placeholder="0"></div>
       <div><label>Paid?</label><select id="fPaid"><option>Paid</option><option>Unpaid</option><option>Part-paid</option></select></div>
       <div><label>How did they find us?</label><select id="fSource">
         <option>Google</option><option>Website</option><option>Facebook</option><option>Instagram</option>
@@ -172,7 +173,7 @@ function setSync(t){const el=document.getElementById('syncStatus');if(el)el.text
 function jobParams(job){
   const notesFull=[job.notes, job.vehicle?('Vehicle: '+job.vehicle):''].filter(Boolean).join(' · ');
   return new URLSearchParams({uid:job.uid||'',date:job.date||'',name:job.name||'',phone:job.phone||'',town:job.town||'',
-    price:job.price||'',service:job.service||'',paid:job.paid||'',source:job.source||'',notes:notesFull,time:job.time||'',
+    price:job.price||'',expense:job.expense||'',service:job.service||'',paid:job.paid||'',source:job.source||'',notes:notesFull,time:job.time||'',
     okPost:(job.okPost?'Yes':'No'), photos:JSON.stringify(job.photos||[])});
 }
 /* A POST to an Apps Script /exec URL is answered with a 302 redirect whose
@@ -206,7 +207,7 @@ function nowParts(){const d=new Date();const pad=n=>String(n).padStart(2,'0');
 function resetForm(){
   const n=nowParts();
   fDate.value=n.date; fTime.value=n.time;
-  ['fName','fPhone','fVehicle','fTown','fPrice','fNotes'].forEach(id=>document.getElementById(id).value='');
+  ['fName','fPhone','fVehicle','fTown','fPrice','fExpense','fNotes'].forEach(id=>document.getElementById(id).value='');
   fService.selectedIndex=0; fPaid.selectedIndex=0; fSource.selectedIndex=0; fPost.checked=true;
   pending=[]; renderThumbs();
 }
@@ -239,7 +240,7 @@ function saveJob(){
   if(!fDate.value){alert('Please set a date.');return;}
   const job={uid:'KS'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
     id:nextId(),date:fDate.value,time:fTime.value,name:fName.value.trim(),phone:fPhone.value.trim(),
-    vehicle:fVehicle.value.trim(),town:fTown.value.trim(),service:fService.value,price:fPrice.value,
+    vehicle:fVehicle.value.trim(),town:fTown.value.trim(),service:fService.value,price:fPrice.value,expense:fExpense.value,
     paid:fPaid.value,source:fSource.value,notes:fNotes.value.trim(),okPost:fPost.checked,
     photos:pending.slice(),photoCount:pending.length};
   jobs.unshift(job); persist(); render(); syncToSheet(job); resetForm();
@@ -292,7 +293,7 @@ function render(){
     return `<div class="job"><div class="top"><div>
       <div class="id">${j.id}</div><h3>${j.service}${j.name?' - '+esc(j.name):''}</h3>
       <div class="meta">${[j.vehicle,j.town].filter(Boolean).map(esc).join(' · ')||'&nbsp;'}${j.notes?'<br>'+esc(j.notes):''}</div>
-      <div style="margin-top:8px">${j.price?`<span class="pill pgreen">£${esc(j.price)}</span>`:''}<span class="pill pamber">${esc(j.paid||'')}</span><span class="pill pblue">${esc(j.source||'')}</span>${j.okPost?'<span class="pill pgreen">OK to post</span>':'<span class="pill pamber">no posting</span>'}</div>
+      <div style="margin-top:8px">${j.price?`<span class="pill pgreen">£${esc(j.price)}</span>`:''}${j.expense?`<span class="pill" style="background:#FDE7E9;color:#B4232A">Cost £${esc(j.expense)}</span>`:''}<span class="pill pamber">${esc(j.paid||'')}</span><span class="pill pblue">${esc(j.source||'')}</span>${j.okPost?'<span class="pill pgreen">OK to post</span>':'<span class="pill pamber">no posting</span>'}</div>
       </div><div style="text-align:right"><div class="when">${when}</div><button class="del" onclick="delJob('${j.id}')">Delete</button></div></div>
       ${photos?`<div class="jt">${photos}</div>`:photoNote}</div>`;
   }).join('');
