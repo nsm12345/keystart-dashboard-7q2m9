@@ -167,19 +167,27 @@ function savePDF(){
 }
 
 const MONTHS=[
- {name:'Month 0',range:'Launch baseline - 15 Jun 2026',has:true,
+ {name:'Baseline',range:'Before 15 Jun 2026 (pre-Noonop)',has:true,
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
-  engFb:[60,90,140,190,240],engIg:[0,80,260,520,900],
+  engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
   fbNow:191,igNow:10,reviews:18,jobs:0,revenue:0,contentPub:0,contentPlan:8,
   goals:[['Facebook Followers',191,220,C.blue],['Instagram Followers',10,50,C.purple],['Google Reviews',18,25,C.amber],['Content Published',0,8,C.green],['Website Visits',0,150,C.teal]],
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
- {name:'Month 1',range:'15 Jun - 12 Jul 2026',has:false},
+ {name:'Month 1',range:'15 Jun - 12 Jul 2026',has:true,
+  weeks:['Start','W1','W2','W3','W4'],
+  fb:[191,191,191,191,191],ig:[10,10,10,10,10],
+  engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
+  fbNow:191,igNow:10,reviews:18,jobs:7,revenue:1215,contentPub:0,contentPlan:8,
+  goals:[['Facebook Followers',191,220,C.blue],['Instagram Followers',10,50,C.purple],['Google Reviews',18,25,C.amber],['Content Published',0,8,C.green],['Jobs Logged',7,10,C.teal]],
+  cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
+   ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
+   ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
  {name:'Month 2',range:'13 Jul - 12 Aug 2026',has:false},
 ];
-let mi=0;
+let mi=1;
 const SCOPE=[
  ['s-d','\u2713','Website Content &amp; UX Refinements'],
  ['s-d','\u2713','Basic On-Page SEO Setup'],
@@ -198,7 +206,7 @@ const EXTRAS=[
 function jobsThisMonth(){try{const a=JSON.parse(localStorage.getItem('keystart_jobs_v1')||'[]');const ym=new Date().toISOString().slice(0,7);return a.filter(j=>(j.date||'').slice(0,7)===ym).length;}catch(e){return 0;}}
 function renderMonth(){
  const m=MONTHS[mi];
- const jobsVal=m.has?(mi===0?jobsThisMonth():m.jobs):'-';
+ const jobsVal=m.has?m.jobs:'-';
  document.getElementById('curM').textContent=m.name;
  document.getElementById('prev').disabled=mi===0;document.getElementById('next').disabled=mi===MONTHS.length-1;
  const STAT=m.has?[
