@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex, nofollow"/>
 <title>Keystart - Performance Dashboard</title>
 <meta name="theme-color" content="#0E1F3A">
 <link rel="icon" type="image/png" href="keystart-icon-192.png">
 <link rel="apple-touch-icon" href="keystart-icon-192.png">
 <link rel="manifest" href="dashboard.webmanifest">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
@@ -152,7 +153,17 @@ function savePDF(){
      windowWidth:W,
      width:W,
      scrollX:0,
-     scrollY:-window.scrollY
+     scrollY:-window.scrollY,
+     onclone:function(doc){
+       // Belt-and-braces: strip CSS that snapshot engines can choke on so we always
+       // get a real downloadable PDF and never fall through to the browser print dialog.
+       try{
+         doc.querySelectorAll('*').forEach(function(n){
+           if(n.style){ n.style.backdropFilter='none'; n.style.webkitBackdropFilter='none'; }
+         });
+         var nm=doc.querySelector('.nmark'); if(nm){ nm.style.background='#2E6BE6'; }
+       }catch(e){}
+     }
    }).then(function(canvas){
      const jsPDF=window.jspdf.jsPDF;
      const w=canvas.width, h=canvas.height;
