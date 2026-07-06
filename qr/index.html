@@ -7,11 +7,16 @@
 <title>Keystart Auto Locksmiths</title>
 <script>
   // ============================================================
-  // DYNAMIC QR REDIRECT — change DESTINATION to re-target the
-  // printed QR code without reprinting anything.
+  // DYNAMIC QR REDIRECT
+  //  - Change BASE below to re-target EVERY printed QR at once
+  //    (no reprints needed).
+  //  - Source tracking: add ?src=flyer / ?src=card etc. to the
+  //    QR's URL. It is passed through to the links page so each
+  //    printed item is tracked separately. Defaults to "qr".
   // ============================================================
-  var DESTINATION = "https://go.keystartautolocksmiths.co.uk/links.html?src=qr";
-  location.replace(DESTINATION);
+  var BASE = "https://go.keystartautolocksmiths.co.uk/links.html";
+  var src = (new URLSearchParams(location.search)).get("src") || "qr";
+  location.replace(BASE + "?src=" + encodeURIComponent(src));
 </script>
 <meta http-equiv="refresh" content="0;url=https://go.keystartautolocksmiths.co.uk/links.html?src=qr">
 </head>
