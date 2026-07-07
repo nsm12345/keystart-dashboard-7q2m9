@@ -1,0 +1,13 @@
+{
+  "name": "Keystart Performance Dashboard",
+  "short_name": "Keystart",
+  "start_url": "dashboard.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0d1017",
+  "theme_color": "#0E1F3A",
+  "icons": [
+    { "src": "keystart-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "keystart-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
