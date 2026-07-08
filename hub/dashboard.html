@@ -57,6 +57,12 @@
   .kv .r{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}.kv .r .k{color:var(--muted);flex:0 0 108px}
   .chips{display:flex;flex-wrap:wrap;gap:6px}.chips span{font-size:11px;background:var(--panel2);border:1px solid var(--border);color:#b7c2d0;border-radius:6px;padding:4px 8px}
   .svc{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}.svc span{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:#dbe4ee;background:#1b212b;border:1px solid var(--border);border-radius:10px;padding:10px 12px;transition:border-color .15s,transform .15s}.svc span:hover{border-color:var(--teal);transform:translateY(-1px)}.svc span::before{content:'\2713';flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(57,197,207,.16);color:var(--teal);font-size:11px;font-weight:800}
+  .acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 24px}
+  .actg .gl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:7px}
+  .actg ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .actg li{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.35}
+  .actg li::before{content:'\2713';color:var(--green);font-weight:800;font-size:11px;flex:0 0 auto;margin-top:2px}
+  .actg li .m{color:var(--muted)}
   .empty{display:flex;align-items:center;justify-content:center;height:150px;color:var(--muted);font-size:12px;text-align:center}
   footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--border);margin-top:16px;padding:15px 4px;color:var(--muted);font-size:11px}
   @media(max-width:1000px){.r6{grid-template-columns:repeat(3,1fr)}.r5{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(2,1fr)}.r3,.r2,.r2b{grid-template-columns:1fr}}
@@ -99,6 +105,11 @@
 
   <div class="row r5" id="stats"></div>
 
+  <div class="row">
+    <div class="panel"><div class="ph">This month — what we did <span id="actRange" style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400"></span></div>
+      <div class="acts" id="acts"></div></div>
+  </div>
+
   <div class="row r2">
     <div class="panel"><div class="ph">Social Media Content</div>
       <div style="font-size:13px;color:var(--text);margin:0 0 12px;padding:0 2px"><b>6 Branded Posts &amp; 2 Reels</b></div>
@@ -108,7 +119,7 @@
 
   <div class="row">
     <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul>
-      <div class="ph" style="margin-top:14px">ENHANCEMENTS</div><ul class="scope" id="extras"></ul></div>
+      <div class="ph" style="margin-top:14px">ENHANCEMENTS</div><ul class="scope" id="extras"></ul><div class="ph" style="margin-top:14px">EXTRAS — INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div>
   </div>
 
   <div class="row r2b">
@@ -187,11 +198,18 @@ const MONTHS=[
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
- {name:'Month 1',range:'15 Jun - 12 Jul 2026',has:true,
+ {name:'Month 1',range:'15 Jun - 15 Jul 2026',has:true,
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
   engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
   fbNow:191,igNow:10,reviews:18,jobs:7,revenue:1215,contentPub:0,contentPlan:8,
+  acts:[
+   ['Profiles &amp; setup',['New branded cover photo <span class="m">— FB &amp; IG</span>','Bio / About refreshed','Cities &amp; service areas added','Instagram connected to Facebook']],
+   ['Content posted',['Instagram post + story','Facebook story','Key posts pinned <span class="m">— FB &amp; IG</span>','Posts saved as FB highlights']],
+   ['Automation',['Instant auto-reply live <span class="m">— Messenger, IG &amp; WhatsApp</span>']],
+   ['Foundations',['Hub, job tracker &amp; dashboard live','Shared Google Drive set up','Google Business Profile optimised','23 blog / SEO articles published']],
+   ['Print',['Business cards &amp; flyer ordered']]
+  ],
   goals:[['Facebook Followers',191,220,C.blue],['Instagram Followers',10,50,C.purple],['Google Reviews',18,25,C.amber],['Content Published',0,8,C.green],['Jobs Logged',7,10,C.teal]],
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
@@ -217,6 +235,12 @@ const EXTRAS=[
  ['s-d','\u2713','Shared Google Drive (Media &amp; Reports)'],
  ['s-d','\u2713','Instant Auto-Reply \u2014 Messenger, Instagram &amp; WhatsApp'],
 ];
+const EXTRAFREE=[
+ ['s-d','\u2713','Marketing Hub (Client Portal)'],
+ ['s-d','\u2713','Live Job Tracker'],
+ ['s-d','\u2713','Shared Google Drive (Media &amp; Reports)'],
+ ['s-d','\u2713','Instant Auto-Reply \u2014 Messenger, Instagram &amp; WhatsApp'],
+];
 
 function jobsThisMonth(){try{const a=JSON.parse(localStorage.getItem('keystart_jobs_v1')||'[]');const ym=new Date().toISOString().slice(0,7);return a.filter(j=>(j.date||'').slice(0,7)===ym).length;}catch(e){return 0;}}
 function renderMonth(){
@@ -235,11 +259,16 @@ function renderMonth(){
    :'<div class="empty">Goals set at the start of the month</div>';
  document.getElementById('cal').innerHTML=m.has?m.cal.map(c=>`<li><span class="dt">${c[0]}</span><span class="tp tp-${c[1]}">${c[1]==='reel'?'REEL':'POST'}</span><span>${c[2]}</span><span class="ch">${c[3]}</span></li>`).join('')
    :'<div class="empty">Content plan published at month start</div>';
+ document.getElementById('actRange').textContent=(m.has&&m.acts)?m.range:'';
+ document.getElementById('acts').innerHTML=(m.has&&m.acts&&m.acts.length)
+   ?m.acts.map(g=>`<div class="actg"><div class="gl">${g[0]}</div><ul>${g[1].map(it=>`<li><span>${it}</span></li>`).join('')}</ul></div>`).join('')
+   :'<div class="empty">Activity for this month appears here as work is delivered</div>';
 }
 
 function renderStatic(){
  document.getElementById('scope').innerHTML=SCOPE.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
  document.getElementById('extras').innerHTML=EXTRAS.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
+ document.getElementById('extras2').innerHTML=EXTRAFREE.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
 }
 
 
