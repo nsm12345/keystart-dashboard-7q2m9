@@ -135,7 +135,9 @@
   </div>
 
   <div class="row" id="rowIncluded">
-    <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul></div>
+    <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul>
+      <div id="enhWrap"><div class="ph" style="margin-top:14px">ENHANCEMENTS</div><ul class="scope" id="enh"></ul></div>
+      <div id="extrasWrap"><div class="ph" style="margin-top:14px">EXTRAS — INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div></div>
   </div>
 
   <div class="row r2b" id="rowInfo">
@@ -164,44 +166,39 @@ function mk(id,t,d,o){if(charts[id])charts[id].destroy();charts[id]=new Chart(do
 function savePDF(){
  const el=document.querySelector('.wrap');
  const btn=document.getElementById('pdfBtn');
- const done=()=>{ if(btn){btn.disabled=false;btn.textContent='\u2B07 Save as PDF';} };
- // Need both libraries; if either failed to load, fall back to the browser print dialog.
+ const reset=(t)=>{ if(btn){btn.disabled=false;btn.textContent=t||'\u2B07 Save as PDF';} };
  if(typeof html2canvas!=='function' || !window.jspdf || !window.jspdf.jsPDF){ window.print(); return; }
- if(btn){btn.disabled=true;btn.textContent='Preparing PDF...';}
- // Force a full desktop-width render so the multi-column layout is captured exactly as on screen,
- // never the narrow stacked mobile version, and nothing on the sides is clipped.
+ // Open a tab NOW, inside the click gesture, so it isn't popup-blocked after the async render.
+ const win=window.open('','_blank');
+ if(win){ try{ win.document.write('<title>Preparing PDF\u2026</title><body style="margin:0;background:#0d1017;color:#8b949e;font:15px system-ui;display:flex;align-items:center;justify-content:center;height:100vh">Preparing your dashboard PDF\u2026</body>'); }catch(e){} }
+ if(btn){btn.disabled=true;btn.textContent='Preparing PDF\u2026';}
  const W=Math.max(el.scrollWidth,el.offsetWidth,1180);
- // Give Chart.js a beat to finish painting, then snapshot the whole dashboard to one image.
  setTimeout(function(){
    html2canvas(el,{
-     backgroundColor:'#0d1017',
-     scale:2,
-     useCORS:true,
-     windowWidth:W,
-     width:W,
-     scrollX:0,
-     scrollY:-window.scrollY,
+     backgroundColor:'#0d1017', scale:2, useCORS:true, windowWidth:W, width:W, scrollX:0, scrollY:-window.scrollY,
      onclone:function(doc){
-       // Belt-and-braces: strip CSS that snapshot engines can choke on so we always
-       // get a real downloadable PDF and never fall through to the browser print dialog.
        try{
-         doc.querySelectorAll('*').forEach(function(n){
-           if(n.style){ n.style.backdropFilter='none'; n.style.webkitBackdropFilter='none'; }
-         });
+         doc.querySelectorAll('*').forEach(function(n){ if(n.style){ n.style.backdropFilter='none'; n.style.webkitBackdropFilter='none'; } });
          var nm=doc.querySelector('.nmark'); if(nm){ nm.style.background='#2E6BE6'; }
        }catch(e){}
      }
    }).then(function(canvas){
      const jsPDF=window.jspdf.jsPDF;
      const w=canvas.width, h=canvas.height;
-     // Page is sized to the captured image (single page) => a pixel-perfect copy of the page,
-     // with no A4 re-flow that would change the layout.
      const pdf=new jsPDF({orientation:(w>=h?'l':'p'),unit:'px',format:[w,h],compress:true});
      pdf.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,w,h);
+     // 1) show it in the new tab (visible confirmation), 2) also download the file.
+     const url=pdf.output('bloburl');
+     if(win && !win.closed){ win.location.href=url; }
      pdf.save('Keystart-Performance-Dashboard.pdf');
-     done();
-   }).catch(function(){ done(); window.print(); });
- },350);
+     reset('\u2713 Saved \u2014 check Downloads');
+     setTimeout(function(){ reset(); }, 3000);
+   }).catch(function(err){
+     if(win && !win.closed) win.close();
+     reset();
+     window.print();
+   });
+ },300);
 }
 
 const MONTHS=[
@@ -230,6 +227,8 @@ const MONTHS=[
     wix:{visitors:61,newPct:97,duration:61,bounce:73,fromGoogle:34,forms:3},
     fb:{reach:5500,views:10364,visits:329,interactions:66,newFollows:11,posts:3},
     ig:{posts:3,reach:null}},
+  enh:[['s-d','✓','Flyer Design'],['s-d','✓','Business Card Design']],
+  extras:[['s-d','✓','Marketing Hub (Client Portal)'],['s-d','✓','Live Job Tracker'],['s-d','✓','Shared Google Drive'],['s-d','✓','Auto-Generated Message Response — Messenger, Instagram &amp; WhatsApp']],
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
@@ -266,13 +265,10 @@ function statsGroupsHTML(S,isBaseline){
    ['Instagram','#bc8cff',[['Posts',v(S.ig.posts)],['Reach',v(S.ig.reach)]]],
    ['Google Business','#d29922',[['Search views',v(S.gbp.views)],['Profile interactions',v(S.gbp.interactions)],['Rating',S.gbp.rating==null?'—':S.gbp.rating.toFixed(1)+'★']]]
  ];
- const cap=isBaseline?'Google &amp; Wix: 1–31 May 2026 · Facebook: 20 May–16 Jun 2026'
-   :'Wix &amp; Google: 15 Jun–14 Jul 2026 · Facebook: 16 Jun–13 Jul 2026';
  return '<div class="startgrid">'+groups.map(g=>
    `<div class="sg"><div class="sgh"><span class="sdot" style="background:${g[1]}"></span>${g[0]}</div>`+
    g[2].map(r=>`<div class="sgr"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')+
-   '</div>').join('')+'</div>'+
-   '<div class="startcap">'+cap+'</div>';
+   '</div>').join('')+'</div>';
 }
 function renderMonth(){
  const m=MONTHS[mi];
@@ -297,6 +293,8 @@ function renderMonth(){
  document.getElementById('rowSC').style.display=isM0?'none':'';
  document.getElementById('rowIncluded').style.display=isM0?'none':'';
  document.getElementById('rowInfo').style.display=isM0?'':'none';
+ if(m.enh&&m.enh.length){document.getElementById('enhWrap').style.display='';document.getElementById('enh').innerHTML=m.enh.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('enhWrap').style.display='none';}
+ if(m.extras&&m.extras.length){document.getElementById('extrasWrap').style.display='';document.getElementById('extras2').innerHTML=m.extras.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('extrasWrap').style.display='none';}
  if(!isM0){
    document.getElementById('goalsHead').textContent='Goals';
    document.getElementById('goals').innerHTML=m.has?m.goals.map(g=>{const pct=Math.max(2,Math.round(g[1]/g[2]*100));
