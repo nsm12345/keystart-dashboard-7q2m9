@@ -57,18 +57,21 @@
   .kv .r{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}.kv .r .k{color:var(--muted);flex:0 0 108px}
   .chips{display:flex;flex-wrap:wrap;gap:6px}.chips span{font-size:11px;background:var(--panel2);border:1px solid var(--border);color:#b7c2d0;border-radius:6px;padding:4px 8px}
   .svc{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}.svc span{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:#dbe4ee;background:#1b212b;border:1px solid var(--border);border-radius:10px;padding:10px 12px;transition:border-color .15s,transform .15s}.svc span:hover{border-color:var(--teal);transform:translateY(-1px)}.svc span::before{content:'\2713';flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(57,197,207,.16);color:var(--teal);font-size:11px;font-weight:800}
-  .acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 24px}
-  .actg .gl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:7px}
-  .actg ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-  .actg li{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.35}
-  .actg li::before{content:'\2713';color:var(--green);font-weight:800;font-size:11px;flex:0 0 auto;margin-top:2px}
-  .actg li .m{color:var(--muted)}
   .empty{display:flex;align-items:center;justify-content:center;height:150px;color:var(--muted);font-size:12px;text-align:center}
   footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--border);margin-top:16px;padding:15px 4px;color:var(--muted);font-size:11px}
   @media(max-width:1000px){.r6{grid-template-columns:repeat(3,1fr)}.r5{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(2,1fr)}.r3,.r2,.r2b{grid-template-columns:1fr}}
   @media(max-width:560px){.r6{grid-template-columns:repeat(2,1fr)}.r5{grid-template-columns:repeat(2,1fr)}}
   @media print{body{background:#fff;color:#111}.panel{break-inside:avoid}.btn,.mnav{display:none}}
 .ncursive{font-family:"Great Vibes",cursive;line-height:.85}.ncsub{font-family:Georgia,"Times New Roman",serif;text-transform:uppercase;letter-spacing:.32em}.nlock{display:inline-flex;flex-direction:column}
+.startgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(188px,1fr));gap:10px}
+.sg{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
+.sgh{display:flex;align-items:center;gap:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#c8d3e0;margin-bottom:8px}
+.sdot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.sgr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
+.sgr:first-of-type{border-top:0}
+.sgr b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+.sgnote{font-size:10px;color:var(--muted);margin-top:6px;font-style:italic}
+.startcap{font-size:10.5px;color:var(--muted);text-align:center;margin-top:11px;letter-spacing:.02em}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Pinyon+Script&display=swap" rel="stylesheet"><style id="ks-navbar">
 #ksnav{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid #e6ebf2;
@@ -99,25 +102,42 @@
     <div class="tr">
       <div class="mnav"><button id="prev">◀</button><span class="cur" id="curM">Month 0</span><button id="next">▶</button></div>
       <input type="file" id="file" accept=".csv" style="display:none">
+      <span id="updated" style="font-size:11px;color:var(--muted)"></span>
+      <button class="btn" id="editBtn" onclick="toggleEdit()">✎ Update figures</button>
       <button class="btn" id="pdfBtn" onclick="savePDF()">⬇ Save as PDF</button>
     </div>
   </div>
 
   <div class="row r5" id="stats"></div>
 
-  <div class="row">
-    <div class="panel"><div class="ph">This month — what we did <span id="actRange" style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400"></span></div>
-      <div class="acts" id="acts"></div></div>
+  <div class="panel" id="editPanel" style="display:none;margin-bottom:12px">
+    <div class="ph">Update current figures <span style="color:var(--muted)">— type today's numbers, saved on this device</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Facebook followers<input type="number" id="e_fb" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Instagram followers<input type="number" id="e_ig" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Google reviews<input type="number" id="e_rev" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Website visits<input type="number" id="e_wv" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Posts &amp; reels published<input type="number" id="e_cp" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+    </div>
+    <div style="margin-top:11px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="btn" onclick="saveFigures()" style="background:#2E6BE6;color:#fff;border-color:#2E6BE6">Save figures</button>
+      <button class="btn" onclick="toggleEdit()">Cancel</button>
+      <span style="font-size:11px;color:var(--muted)">Jobs update automatically from the Job Tracker.</span>
+    </div>
   </div>
 
-  <div class="row r2">
-    <div class="panel"><div class="ph">Social Media Content</div>
+  <div class="row" id="rowStats">
+    <div class="panel"><div class="ph" id="statsHead">Statistics</div><div id="statsBreak"></div></div>
+  </div>
+
+  <div class="row r2" id="rowSC">
+    <div class="panel" id="scPanel"><div class="ph">Social Media Content</div>
       <div style="font-size:13px;color:var(--text);margin:0 0 12px;padding:0 2px"><b>6 Branded Posts &amp; 2 Reels</b></div>
       <ul class="cal" id="cal"></ul></div>
-    <div class="panel"><div class="ph">Goals</div><div id="goals"></div></div>
+    <div class="panel"><div class="ph" id="goalsHead">Goals</div><div id="goals"></div></div>
   </div>
 
-  <div class="row">
+  <div class="row" id="rowIncluded">
     <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul>
       <div class="ph" style="margin-top:14px">ENHANCEMENTS</div><ul class="scope" id="extras"></ul><div class="ph" style="margin-top:14px">EXTRAS — INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div>
   </div>
@@ -189,28 +209,31 @@ function savePDF(){
 }
 
 const MONTHS=[
- {name:'Baseline',range:'Before 15 Jun 2026 (pre-Noonop)',has:true,
+ {name:'Month 0',range:'Start — as at 15 Jun 2026',has:true,
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
   engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
   fbNow:191,igNow:10,reviews:18,jobs:0,revenue:0,contentPub:0,contentPlan:8,
+  start:{webVisits:34,
+    gbp:{views:182,interactions:21,rating:5.0},
+    wix:{visitors:28,newPct:86,duration:170,bounce:68,fromGoogle:22,forms:2},
+    fb:{reach:237,views:829,visits:194,interactions:6,newFollows:3,posts:2},
+    ig:{posts:null,reach:null}},
   goals:[['Facebook Followers',191,220,C.blue],['Instagram Followers',10,50,C.purple],['Google Reviews',18,25,C.amber],['Content Published',0,8,C.green],['Website Visits',0,150,C.teal]],
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
- {name:'Month 1',range:'15 Jun - 15 Jul 2026',has:true,
+ {name:'Month 1',range:'15 Jun - 12 Jul 2026',has:true,
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
   engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
-  fbNow:191,igNow:10,reviews:18,jobs:7,revenue:1215,contentPub:0,contentPlan:8,
-  acts:[
-   ['Profiles &amp; setup',['New branded cover photo <span class="m">— FB &amp; IG</span>','Bio / About refreshed','Cities &amp; service areas added','Instagram connected to Facebook']],
-   ['Content posted',['Instagram post + story','Facebook story','Key posts pinned <span class="m">— FB &amp; IG</span>','Posts saved as FB highlights']],
-   ['Automation',['Instant auto-reply live <span class="m">— Messenger, IG &amp; WhatsApp</span>']],
-   ['Foundations',['Hub, job tracker &amp; dashboard live','Shared Google Drive set up','Google Business Profile optimised','23 blog / SEO articles published']],
-   ['Print',['Business cards &amp; flyer ordered']]
-  ],
-  goals:[['Facebook Followers',191,220,C.blue],['Instagram Followers',10,50,C.purple],['Google Reviews',18,25,C.amber],['Content Published',0,8,C.green],['Jobs Logged',7,10,C.teal]],
+  fbNow:196,igNow:13,reviews:19,jobs:7,revenue:1215,contentPub:0,contentPlan:8,webVisits:80,
+  goals:[['Facebook Followers',196,220,C.blue],['Instagram Followers',13,50,C.purple],['Google Reviews',19,25,C.amber],['Website Visits',80,150,C.teal],['Jobs Logged',7,10,C.green],['Content Published',3,8,C.blue]],
+  stats:{webVisits:80,
+    gbp:{views:221,interactions:104,rating:5.0},
+    wix:{visitors:61,newPct:97,duration:61,bounce:73,fromGoogle:34,forms:3},
+    fb:{reach:5500,views:10364,visits:329,interactions:66,newFollows:11,posts:3},
+    ig:{posts:3,reach:null}},
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
@@ -230,10 +253,6 @@ const SCOPE=[
 const EXTRAS=[
  ['s-d','\u2713','Flyer Design'],
  ['s-d','\u2713','Business Card Design'],
- ['s-d','\u2713','Marketing Hub (Client Portal)'],
- ['s-d','\u2713','Live Job Tracker'],
- ['s-d','\u2713','Shared Google Drive (Media &amp; Reports)'],
- ['s-d','\u2713','Instant Auto-Reply \u2014 Messenger, Instagram &amp; WhatsApp'],
 ];
 const EXTRAFREE=[
  ['s-d','\u2713','Marketing Hub (Client Portal)'],
@@ -243,26 +262,52 @@ const EXTRAFREE=[
 ];
 
 function jobsThisMonth(){try{const a=JSON.parse(localStorage.getItem('keystart_jobs_v1')||'[]');const ym=new Date().toISOString().slice(0,7);return a.filter(j=>(j.date||'').slice(0,7)===ym).length;}catch(e){return 0;}}
+function statsGroupsHTML(S,isBaseline){
+ const v=x=>x==null?'—':Number(x).toLocaleString('en-GB'), dur=s=>s==null?'—':Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s', pc=x=>x==null?'—':v(x)+'%';
+ const groups=[
+   ['Website · Wix','#39c5cf',[['Unique visitors',v(S.wix.visitors)],['New visitors',pc(S.wix.newPct)],['Avg. session',dur(S.wix.duration)],['Bounce rate',pc(S.wix.bounce)],['Visits from Google',v(S.wix.fromGoogle)],['Contact forms',v(S.wix.forms)]]],
+   ['Facebook','#58a6ff',[['Reach',v(S.fb.reach)],['Post views',v(S.fb.views)],['Page visits',v(S.fb.visits)],['Content interactions',v(S.fb.interactions)],['New follows',v(S.fb.newFollows)],['Posts published',v(S.fb.posts)]]],
+   ['Instagram','#bc8cff',[['Posts',v(S.ig.posts)],['Reach',v(S.ig.reach)]]],
+   ['Google Business','#d29922',[['Search views',v(S.gbp.views)],['Profile interactions',v(S.gbp.interactions)],['Rating',S.gbp.rating==null?'—':S.gbp.rating.toFixed(1)+'★']]]
+ ];
+ const cap=isBaseline?'Initial · Google &amp; Wix: 1–31 May 2026 · Facebook: 28-day to 16 Jun'
+   :'This month · Wix &amp; Google: last 30 days · Facebook: 28-day to 13 Jul';
+ return '<div class="startgrid">'+groups.map(g=>
+   `<div class="sg"><div class="sgh"><span class="sdot" style="background:${g[1]}"></span>${g[0]}</div>`+
+   g[2].map(r=>`<div class="sgr"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')+
+   '</div>').join('')+'</div>'+
+   '<div class="startcap">'+cap+'</div>';
+}
 function renderMonth(){
  const m=MONTHS[mi];
+ const isM0=mi===0;
  const jobsVal=m.has?m.jobs:'-';
  document.getElementById('curM').textContent=m.name;
  document.getElementById('prev').disabled=mi===0;document.getElementById('next').disabled=mi===MONTHS.length-1;
+ const wv=isM0?(m.start?m.start.webVisits:null):m.webVisits;
+ const webCell=(wv!=null&&wv>0)?[wv,'Visits']:['Live',''];
  const STAT=m.has?[
-   ['s-green','Website','Live',''],['s-blue','Facebook',m.fbNow,'Followers'],
-   ['s-purple','Instagram',m.igNow,'Followers'],['s-amber','Google reviews',m.reviews,''],
+   ['s-green','Website',webCell[0],webCell[1]],['s-blue','Facebook',m.fbNow,'Followers'],
+   ['s-purple','Instagram',m.igNow,'Followers'],['s-amber','Google',m.reviews,'Reviews'],
    ['s-teal','Jobs',jobsVal,'Logged']]
-  :[['s-green','Website','-','upcoming'],['s-blue','Facebook','-',''],['s-purple','Instagram','-',''],['s-amber','Reviews','-',''],['s-teal','Jobs','-','']];
+  :[['s-green','Website','-','upcoming'],['s-blue','Facebook','-',''],['s-purple','Instagram','-',''],['s-amber','Google','-','Reviews'],['s-teal','Jobs','-','']];
  document.getElementById('stats').innerHTML=STAT.map(s=>`<div class="panel stat ${s[0]}"><div class="ph">${s[1]}</div><div class="v">${s[2]}</div><div class="d">${s[3]}</div></div>`).join('');
- document.getElementById('goals').innerHTML=m.has?m.goals.map(g=>{const pct=Math.max(2,Math.round(g[1]/g[2]*100));
-   return `<div class="goal"><div class="gl"><span class="n">${g[0]}</span><span class="x">${g[1]} / ${g[2]}</span></div><div class="track"><div class="fill" style="width:${pct}%;background:${g[3]}">${pct>14?pct+'%':''}</div></div></div>`;}).join('')
-   :'<div class="empty">Goals set at the start of the month</div>';
+ const bd=isM0?m.start:m.stats, rowStats=document.getElementById('rowStats');
+ if(bd){
+   document.getElementById('statsHead').textContent=isM0?'Initial statistics':"This month's statistics";
+   document.getElementById('statsBreak').innerHTML=statsGroupsHTML(bd,isM0);
+   rowStats.style.display='';
+ }else{rowStats.style.display='none';}
+ document.getElementById('rowSC').style.display=isM0?'none':'';
+ document.getElementById('rowIncluded').style.display=isM0?'none':'';
+ if(!isM0){
+   document.getElementById('goalsHead').textContent='Goals';
+   document.getElementById('goals').innerHTML=m.has?m.goals.map(g=>{const pct=Math.max(2,Math.round(g[1]/g[2]*100));
+     return `<div class="goal"><div class="gl"><span class="n">${g[0]}</span><span class="x">${g[1]} / ${g[2]}</span></div><div class="track"><div class="fill" style="width:${Math.min(pct,100)}%;background:${g[3]}">${pct>14?pct+'%':''}</div></div></div>`;}).join('')
+     :'<div class="empty">Goals set at the start of the month</div>';
+ }
  document.getElementById('cal').innerHTML=m.has?m.cal.map(c=>`<li><span class="dt">${c[0]}</span><span class="tp tp-${c[1]}">${c[1]==='reel'?'REEL':'POST'}</span><span>${c[2]}</span><span class="ch">${c[3]}</span></li>`).join('')
    :'<div class="empty">Content plan published at month start</div>';
- document.getElementById('actRange').textContent=(m.has&&m.acts)?m.range:'';
- document.getElementById('acts').innerHTML=(m.has&&m.acts&&m.acts.length)
-   ?m.acts.map(g=>`<div class="actg"><div class="gl">${g[0]}</div><ul>${g[1].map(it=>`<li><span>${it}</span></li>`).join('')}</ul></div>`).join('')
-   :'<div class="empty">Activity for this month appears here as work is delivered</div>';
 }
 
 function renderStatic(){
@@ -270,6 +315,20 @@ function renderStatic(){
  document.getElementById('extras').innerHTML=EXTRAS.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
  document.getElementById('extras2').innerHTML=EXTRAFREE.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
 }
+const LIVE_KEY='keystart_dash_live_v1';
+function getLive(){try{return JSON.parse(localStorage.getItem(LIVE_KEY)||'{}');}catch(e){return {};}}
+function applyLive(){
+ const L=getLive(),m=MONTHS[1];
+ if(L.fb!=null){m.fbNow=L.fb;m.goals[0][1]=L.fb;}
+ if(L.ig!=null){m.igNow=L.ig;m.goals[1][1]=L.ig;}
+ if(L.rev!=null){m.reviews=L.rev;m.goals[2][1]=L.rev;}
+ if(L.wv!=null){m.webVisits=L.wv;m.goals[3][1]=L.wv;}
+ if(L.cp!=null){m.contentPub=L.cp;m.goals[5][1]=L.cp;}
+ const lj=jobsThisMonth();if(lj>0){m.jobs=lj;m.goals[4][1]=lj;}
+}
+function stampUpdated(){const L=getLive(),el=document.getElementById('updated');if(el&&L.updated){el.textContent='Updated '+new Date(L.updated).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}}
+function toggleEdit(){const p=document.getElementById('editPanel'),show=p.style.display==='none';if(show){const m=MONTHS[1];document.getElementById('e_fb').value=m.fbNow;document.getElementById('e_ig').value=m.igNow;document.getElementById('e_rev').value=m.reviews;document.getElementById('e_wv').value=m.webVisits;document.getElementById('e_cp').value=m.contentPub;}p.style.display=show?'block':'none';}
+function saveFigures(){const L=getLive(),gv=id=>{const v=document.getElementById(id).value.trim();return v===''?null:Number(v);};const fb=gv('e_fb'),ig=gv('e_ig'),rev=gv('e_rev'),wv=gv('e_wv'),cp=gv('e_cp');if(fb!=null)L.fb=fb;if(ig!=null)L.ig=ig;if(rev!=null)L.rev=rev;if(wv!=null)L.wv=wv;if(cp!=null)L.cp=cp;L.updated=new Date().toISOString();localStorage.setItem(LIVE_KEY,JSON.stringify(L));mi=1;applyLive();renderMonth();stampUpdated();toggleEdit();}
 
 
 document.getElementById('info').innerHTML=[['Business','Keystart Auto Locksmiths'],['Owner','Sole Operator · Mobile'],['Base','Glossop, Derbyshire'],
@@ -283,7 +342,7 @@ document.getElementById('prev').onclick=()=>{if(mi>0){mi--;renderMonth();}};
 document.getElementById('next').onclick=()=>{if(mi<MONTHS.length-1){mi++;renderMonth();}};
 document.getElementById('file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById('curM').textContent='Live: '+f.name;};r.readAsText(f);});
 
-renderStatic();renderMonth();
+renderStatic();applyLive();renderMonth();stampUpdated();
 </script>
 </body>
 </html>
