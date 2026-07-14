@@ -130,19 +130,16 @@
     <div class="panel"><div class="ph" id="statsHead">Statistics</div><div id="statsBreak"></div></div>
   </div>
 
-  <div class="row r2" id="rowSC">
-    <div class="panel" id="scPanel"><div class="ph">Social Media Content</div>
-      <div style="font-size:13px;color:var(--text);margin:0 0 12px;padding:0 2px"><b>6 Branded Posts &amp; 2 Reels</b></div>
-      <ul class="cal" id="cal"></ul></div>
+  <div class="row" id="rowSC">
     <div class="panel"><div class="ph" id="goalsHead">Goals</div><div id="goals"></div></div>
   </div>
 
   <div class="row" id="rowIncluded">
     <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul>
-      <div class="ph" style="margin-top:14px">ENHANCEMENTS</div><ul class="scope" id="extras"></ul><div class="ph" style="margin-top:14px">EXTRAS — INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div>
+      <div class="ph" style="margin-top:14px">EXTRAS — INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div>
   </div>
 
-  <div class="row r2b">
+  <div class="row r2b" id="rowInfo">
     <div class="panel"><div class="ph">Key business information</div><div class="kv" id="info"></div></div>
     <div class="panel"><div class="ph">Key Services</div><div class="svc" id="services"></div><div class="chips" id="usp" style="margin-top:10px"></div></div>
   </div>
@@ -209,7 +206,7 @@ function savePDF(){
 }
 
 const MONTHS=[
- {name:'Month 0',range:'Start — as at 15 Jun 2026',has:true,
+ {name:'Month 0',range:'Before 15 Jun 2026',has:true,
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
   engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
@@ -223,7 +220,7 @@ const MONTHS=[
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
- {name:'Month 1',range:'15 Jun - 12 Jul 2026',has:true,
+ {name:'Month 1',range:'15 Jun – 15 Jul 2026',has:true,
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
   engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
@@ -237,7 +234,8 @@ const MONTHS=[
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
- {name:'Month 2',range:'13 Jul - 12 Aug 2026',has:false},
+ {name:'Month 2',range:'15 Jul – 15 Aug 2026',has:false},
+ {name:'Month 3',range:'15 Aug – 15 Sep 2026',has:false},
 ];
 let mi=1;
 const SCOPE=[
@@ -246,8 +244,7 @@ const SCOPE=[
  ['s-d','\u2713','Connect Website &amp; Social Platforms'],
  ['s-d','\u2713','Set Up &amp; Optimise 2 Platforms (Facebook &amp; Instagram)'],
  ['s-d','\u2713','Google Business Profile Optimisation'],
- ['s-d','\u2713','6 Branded Social Posts / Month'],
- ['s-d','\u2713','2 Short Video Reels / Month'],
+ ['s-d','\u2713','6 Branded Social Posts &amp; 2 Short-Form Reels'],
  ['s-d','\u2713','Monthly Performance Summary'],
 ];
 const EXTRAS=[
@@ -257,8 +254,8 @@ const EXTRAS=[
 const EXTRAFREE=[
  ['s-d','\u2713','Marketing Hub (Client Portal)'],
  ['s-d','\u2713','Live Job Tracker'],
- ['s-d','\u2713','Shared Google Drive (Media &amp; Reports)'],
- ['s-d','\u2713','Instant Auto-Reply \u2014 Messenger, Instagram &amp; WhatsApp'],
+ ['s-d','\u2713','Shared Google Drive'],
+ ['s-d','\u2713','Auto-Generated Message Response \u2014 Messenger, Instagram &amp; WhatsApp'],
 ];
 
 function jobsThisMonth(){try{const a=JSON.parse(localStorage.getItem('keystart_jobs_v1')||'[]');const ym=new Date().toISOString().slice(0,7);return a.filter(j=>(j.date||'').slice(0,7)===ym).length;}catch(e){return 0;}}
@@ -270,8 +267,8 @@ function statsGroupsHTML(S,isBaseline){
    ['Instagram','#bc8cff',[['Posts',v(S.ig.posts)],['Reach',v(S.ig.reach)]]],
    ['Google Business','#d29922',[['Search views',v(S.gbp.views)],['Profile interactions',v(S.gbp.interactions)],['Rating',S.gbp.rating==null?'—':S.gbp.rating.toFixed(1)+'★']]]
  ];
- const cap=isBaseline?'Initial · Google &amp; Wix: 1–31 May 2026 · Facebook: 28-day to 16 Jun'
-   :'This month · Wix &amp; Google: last 30 days · Facebook: 28-day to 13 Jul';
+ const cap=isBaseline?'Google &amp; Wix: 1–31 May 2026 · Facebook: 20 May–16 Jun 2026'
+   :'Wix &amp; Google: 15 Jun–14 Jul 2026 · Facebook: 16 Jun–13 Jul 2026';
  return '<div class="startgrid">'+groups.map(g=>
    `<div class="sg"><div class="sgh"><span class="sdot" style="background:${g[1]}"></span>${g[0]}</div>`+
    g[2].map(r=>`<div class="sgr"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')+
@@ -282,7 +279,7 @@ function renderMonth(){
  const m=MONTHS[mi];
  const isM0=mi===0;
  const jobsVal=m.has?m.jobs:'-';
- document.getElementById('curM').textContent=m.name;
+ document.getElementById('curM').innerHTML=m.name+'<br><span style="font-size:9.5px;color:var(--muted);font-weight:500;letter-spacing:0">'+(m.range||'')+'</span>';
  document.getElementById('prev').disabled=mi===0;document.getElementById('next').disabled=mi===MONTHS.length-1;
  const wv=isM0?(m.start?m.start.webVisits:null):m.webVisits;
  const webCell=(wv!=null&&wv>0)?[wv,'Visits']:['Live',''];
@@ -294,25 +291,23 @@ function renderMonth(){
  document.getElementById('stats').innerHTML=STAT.map(s=>`<div class="panel stat ${s[0]}"><div class="ph">${s[1]}</div><div class="v">${s[2]}</div><div class="d">${s[3]}</div></div>`).join('');
  const bd=isM0?m.start:m.stats, rowStats=document.getElementById('rowStats');
  if(bd){
-   document.getElementById('statsHead').textContent=isM0?'Initial statistics':"This month's statistics";
+   document.getElementById('statsHead').textContent=isM0?'Baseline statistics':'Statistics';
    document.getElementById('statsBreak').innerHTML=statsGroupsHTML(bd,isM0);
    rowStats.style.display='';
  }else{rowStats.style.display='none';}
  document.getElementById('rowSC').style.display=isM0?'none':'';
  document.getElementById('rowIncluded').style.display=isM0?'none':'';
+ document.getElementById('rowInfo').style.display=isM0?'':'none';
  if(!isM0){
    document.getElementById('goalsHead').textContent='Goals';
    document.getElementById('goals').innerHTML=m.has?m.goals.map(g=>{const pct=Math.max(2,Math.round(g[1]/g[2]*100));
      return `<div class="goal"><div class="gl"><span class="n">${g[0]}</span><span class="x">${g[1]} / ${g[2]}</span></div><div class="track"><div class="fill" style="width:${Math.min(pct,100)}%;background:${g[3]}">${pct>14?pct+'%':''}</div></div></div>`;}).join('')
      :'<div class="empty">Goals set at the start of the month</div>';
  }
- document.getElementById('cal').innerHTML=m.has?m.cal.map(c=>`<li><span class="dt">${c[0]}</span><span class="tp tp-${c[1]}">${c[1]==='reel'?'REEL':'POST'}</span><span>${c[2]}</span><span class="ch">${c[3]}</span></li>`).join('')
-   :'<div class="empty">Content plan published at month start</div>';
 }
 
 function renderStatic(){
  document.getElementById('scope').innerHTML=SCOPE.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
- document.getElementById('extras').innerHTML=EXTRAS.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
  document.getElementById('extras2').innerHTML=EXTRAFREE.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
 }
 const LIVE_KEY='keystart_dash_live_v1';
