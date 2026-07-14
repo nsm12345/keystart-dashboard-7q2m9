@@ -135,8 +135,7 @@
   </div>
 
   <div class="row" id="rowIncluded">
-    <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul>
-      <div class="ph" style="margin-top:14px">EXTRAS — INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div>
+    <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul></div>
   </div>
 
   <div class="row r2b" id="rowInfo">
@@ -308,7 +307,6 @@ function renderMonth(){
 
 function renderStatic(){
  document.getElementById('scope').innerHTML=SCOPE.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
- document.getElementById('extras2').innerHTML=EXTRAFREE.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');
 }
 const LIVE_KEY='keystart_dash_live_v1';
 function getLive(){try{return JSON.parse(localStorage.getItem(LIVE_KEY)||'{}');}catch(e){return {};}}
