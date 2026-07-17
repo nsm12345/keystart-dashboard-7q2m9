@@ -14,8 +14,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0d1017;--panel:#161b22;--panel2:#1b212b;--border:#262c36;--text:#e6edf3;--muted:#8b949e;
-    --green:#3fb950;--amber:#d29922;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff;--teal:#39c5cf;--grid:#21262d;}
+  :root{--bg:#ffffff;--panel:#ffffff;--panel2:#f4f7fc;--border:#e2e8f2;--text:#0E1F3A;--muted:#5b6675;
+    --green:#0E9F6E;--amber:#C77700;--red:#DC2626;--blue:#2E6BE6;--purple:#7C5CFC;--teal:#0EA5A0;--grid:#e9eef5;}
   *{box-sizing:border-box} html,body{margin:0}
   body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   .wrap{max-width:1280px;margin:0 auto;padding:0 16px 40px}
@@ -30,7 +30,7 @@
   .btn{font-size:11.5px;font-weight:600;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:6px 11px;cursor:pointer}
   .mnav{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:3px}
   .mnav button{background:none;border:0;color:var(--text);font-size:13px;cursor:pointer;padding:4px 8px;border-radius:6px}
-  .mnav button:disabled{color:#475065;cursor:default}.mnav .cur{font-size:12px;font-weight:700;min-width:128px;text-align:center}
+  .mnav button:disabled{color:#aab4c2;cursor:default}.mnav .cur{font-size:12px;font-weight:700;min-width:128px;text-align:center}
   .mnav .yr{font-size:11px;font-weight:600;color:var(--teal);border:1px solid #284;border-radius:6px;padding:4px 9px;cursor:pointer;background:none}
   .mnav .yr.on{background:rgba(57,197,207,.16)}
   .row{display:grid;gap:12px;margin-bottom:12px}
@@ -40,9 +40,15 @@
   .stat .v{font-size:27px;font-weight:800;line-height:1;letter-spacing:-.5px}.stat .d{font-size:11px;margin-top:5px;color:var(--muted)}
   .stat.s-amber .v{color:var(--amber)}.stat.s-blue .v{color:var(--blue)}.stat.s-green .v{color:var(--green)}.stat.s-purple .v{color:var(--purple)}.stat.s-teal .v{color:var(--teal)}
   .goal{margin-bottom:12px}.goal:last-child{margin-bottom:2px}.goal .gl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}.goal .gl .n{font-weight:600}.goal .gl .x{color:var(--muted)}
-  .track{height:15px;background:#0e131a;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .track{height:15px;background:#f4f7fc;border:1px solid var(--border);border-radius:6px;overflow:hidden}
   .fill{height:100%;border-radius:5px 0 0 5px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:10px;font-weight:700;color:#04121f}
   canvas{max-height:168px}
+  .cgrid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .cgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:1000px){.cgrid2,.cgrid3{grid-template-columns:1fr}}
+  .cbox{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:11px 12px;display:flex;flex-direction:column}
+  .ct{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:8px}
+  .cw{position:relative;height:190px}
   .cal{list-style:none;margin:0;padding:0}
   .cal li{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px}.cal li:last-child{border-bottom:0}
   .cal .dt{flex:0 0 50px;color:var(--muted);font-size:11px}
@@ -51,12 +57,12 @@
   .scope{list-style:none;margin:0;padding:0}
   .scope li{display:flex;gap:9px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px}.scope li:last-child{border-bottom:0}
   .scope .ck{flex:0 0 auto;width:17px;height:17px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#04121f}
-  .s-d{background:var(--green)}.s-p{background:var(--amber)}.s-t{background:#3a4150;color:#aeb6c2}
+  .s-d{background:var(--green)}.s-p{background:var(--amber)}.s-t{background:#e2e8f2;color:#475569}
   table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border)}
   th{color:var(--muted);font-size:10px;text-transform:uppercase}td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
   .kv .r{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}.kv .r .k{color:var(--muted);flex:0 0 108px}
-  .chips{display:flex;flex-wrap:wrap;gap:6px}.chips span{font-size:11px;background:var(--panel2);border:1px solid var(--border);color:#b7c2d0;border-radius:6px;padding:4px 8px}
-  .svc{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}.svc span{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:#dbe4ee;background:#1b212b;border:1px solid var(--border);border-radius:10px;padding:10px 12px;transition:border-color .15s,transform .15s}.svc span:hover{border-color:var(--teal);transform:translateY(-1px)}.svc span::before{content:'\2713';flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(57,197,207,.16);color:var(--teal);font-size:11px;font-weight:800}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}.chips span{font-size:11px;background:var(--panel2);border:1px solid var(--border);color:#475569;border-radius:6px;padding:6px 8px;text-align:center}
+  .svc{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}.svc span{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px;font-size:12px;line-height:1.2;font-weight:600;color:#334155;background:#f4f7fc;border:1px solid var(--border);border-radius:9px;padding:11px 8px;min-height:46px;transition:border-color .15s,transform .15s}.svc span:hover{border-color:var(--teal);transform:translateY(-1px)}.svc span::before{content:'\2713';flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;font-size:9px;border-radius:50%;background:rgba(57,197,207,.16);color:var(--teal);font-size:11px;font-weight:800}
   .empty{display:flex;align-items:center;justify-content:center;height:150px;color:var(--muted);font-size:12px;text-align:center}
   footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--border);margin-top:16px;padding:15px 4px;color:var(--muted);font-size:11px}
   @media(max-width:1000px){.r6{grid-template-columns:repeat(3,1fr)}.r5{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(2,1fr)}.r3,.r2,.r2b{grid-template-columns:1fr}}
@@ -65,7 +71,7 @@
 .ncursive{font-family:"Great Vibes",cursive;line-height:.85}.ncsub{font-family:Georgia,"Times New Roman",serif;text-transform:uppercase;letter-spacing:.32em}.nlock{display:inline-flex;flex-direction:column}
 .startgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(188px,1fr));gap:10px}
 .sg{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
-.sgh{display:flex;align-items:center;gap:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#c8d3e0;margin-bottom:8px}
+.sgh{display:flex;align-items:center;gap:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#5b6675;margin-bottom:8px}
 .sdot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto}
 .sgr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
 .sgr:first-of-type{border-top:0}
@@ -109,15 +115,21 @@
   </div>
 
   <div class="row r5" id="stats"></div>
+  <div class="row" id="rowFin" style="grid-template-columns:1fr;display:none">
+    <div class="panel"><div class="ph">Revenue &amp; profit <span style="color:var(--muted)">FROM JOB TRACKER</span></div>
+      <div class="startgrid" id="finGrid"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">Revenue and per job costs come from your Job Tracker. Profit = revenue - expenses.</div>
+    </div>
+  </div>
 
   <div class="panel" id="editPanel" style="display:none;margin-bottom:12px">
-    <div class="ph">Update current figures <span style="color:var(--muted)">— type today's numbers, saved on this device</span></div>
+    <div class="ph">Update current figures <span style="color:var(--muted)">- type today's numbers, saved on this device</span></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Facebook followers<input type="number" id="e_fb" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Instagram followers<input type="number" id="e_ig" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Google reviews<input type="number" id="e_rev" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Website visits<input type="number" id="e_wv" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Posts &amp; reels published<input type="number" id="e_cp" style="width:100%;background:#0e131a;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Facebook followers<input type="number" id="e_fb" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Instagram followers<input type="number" id="e_ig" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Google reviews<input type="number" id="e_rev" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Website visits<input type="number" id="e_wv" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
+      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Posts &amp; reels published<input type="number" id="e_cp" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
     </div>
     <div style="margin-top:11px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <button class="btn" onclick="saveFigures()" style="background:#2E6BE6;color:#fff;border-color:#2E6BE6">Save figures</button>
@@ -129,6 +141,19 @@
   <div class="row" id="rowStats">
     <div class="panel"><div class="ph" id="statsHead">Statistics</div><div id="statsBreak"></div></div>
   </div>
+  <div class="row" id="rowCharts" style="grid-template-columns:1fr">
+    <div class="panel"><div class="ph">Growth &amp; breakdowns</div>
+      <div class="cgrid2">
+        <div class="cbox"><div class="ct">NEW GROWTH THIS MONTH</div><div class="cw"><canvas id="chGrowth"></canvas></div></div>
+        <div class="cbox"><div class="ct">Growth over time</div><div class="cw"><canvas id="chTrend"></canvas></div></div>
+      </div>
+      <div class="cgrid3">
+        <div class="cbox"><div class="ct">Services delivered</div><div class="cw"><canvas id="chSvc"></canvas></div></div>
+        <div class="cbox"><div class="ct" id="chJobsTitle">Jobs by source</div><div class="cw"><canvas id="chJobs"></canvas></div></div>
+        <div class="cbox"><div class="ct" id="chRevTitle">Revenue by source (£)</div><div class="cw"><canvas id="chRev"></canvas></div></div>
+      </div>
+    </div>
+  </div>
 
   <div class="row" id="rowSC">
     <div class="panel"><div class="ph" id="goalsHead">Goals</div><div id="goals"></div></div>
@@ -137,25 +162,25 @@
   <div class="row" id="rowIncluded">
     <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul>
       <div id="enhWrap"><div class="ph" style="margin-top:14px">ENHANCEMENTS</div><ul class="scope" id="enh"></ul></div>
-      <div id="extrasWrap"><div class="ph" style="margin-top:14px">EXTRAS — INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div></div>
+      <div id="extrasWrap"><div class="ph" style="margin-top:14px">EXTRAS - INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div></div>
   </div>
 
-  <div class="row r2b" id="rowInfo">
+  <div class="row" id="rowInfo" style="grid-template-columns:1fr">
     <div class="panel"><div class="ph">Key business information</div><div class="kv" id="info"></div></div>
-    <div class="panel"><div class="ph">Key Services</div><div class="svc" id="services"></div><div class="chips" id="usp" style="margin-top:10px"></div></div>
+    <div class="panel"><div class="ph">Key Services</div><div class="svc" id="services"></div><div class="chips" id="usp" style="margin-top:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div></div>
   </div>
 
   <footer style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;margin-top:18px;padding:24px 12px;border-top:1px solid #e6ebf2;color:#64748B;font-size:12px;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif">
-    <img src="noonop-logo-white.png" alt="Noonop Studios" style="height:56px;width:auto;display:block;margin-bottom:4px">
+    <img src="noonop-logo.png" alt="Noonop Studios" style="height:56px;width:auto;display:block;margin-bottom:4px">
     <div style="font-style:italic">Bespoke digital experiences that elevate your brand</div>
     <div style="margin-bottom:12px"><a href="mailto:info@noonopstudios.com" style="color:inherit;text-decoration:none">info@noonopstudios.com</a> &middot; <a href="https://noonopstudios.com" target="_blank" rel="noopener" style="color:#2E6BE6;text-decoration:none;font-weight:600">noonopstudios.com</a></div>
     <div>Prepared for Keystart Auto Locksmiths</div>
-    <div style="color:#9aa6b6">&copy; Noonop Studios 2026</div>
+    <div style="color:#8b93a0">&copy; Noonop Studios 2026</div>
   </footer>
 </div>
 
 <script>
-const C={blue:'#58a6ff',green:'#3fb950',amber:'#d29922',red:'#f85149',purple:'#bc8cff',teal:'#39c5cf',muted:'#8b949e',grid:'#21262d'};
+const C={blue:'#2E6BE6',green:'#0E9F6E',amber:'#C77700',red:'#DC2626',purple:'#7C5CFC',teal:'#0EA5A0',muted:'#5b6675',grid:'#e9eef5'};
 Chart.defaults.font.family="'Segoe UI',Arial,sans-serif";Chart.defaults.font.size=10;Chart.defaults.color=C.muted;
 Chart.defaults.plugins.legend.labels.usePointStyle=true;Chart.defaults.plugins.legend.labels.boxWidth=8;
 const TT={backgroundColor:'#000',padding:9,cornerRadius:7,borderColor:'#262c36',borderWidth:1};
@@ -170,12 +195,12 @@ function savePDF(){
  if(typeof html2canvas!=='function' || !window.jspdf || !window.jspdf.jsPDF){ window.print(); return; }
  // Open a tab NOW, inside the click gesture, so it isn't popup-blocked after the async render.
  const win=window.open('','_blank');
- if(win){ try{ win.document.write('<title>Preparing PDF\u2026</title><body style="margin:0;background:#0d1017;color:#8b949e;font:15px system-ui;display:flex;align-items:center;justify-content:center;height:100vh">Preparing your dashboard PDF\u2026</body>'); }catch(e){} }
+ if(win){ try{ win.document.write('<title>Preparing PDF\u2026</title><body style="margin:0;background:#ffffff;color:#5b6675;font:15px system-ui;display:flex;align-items:center;justify-content:center;height:100vh">Preparing your dashboard PDF\u2026</body>'); }catch(e){} }
  if(btn){btn.disabled=true;btn.textContent='Preparing PDF\u2026';}
  const W=Math.max(el.scrollWidth,el.offsetWidth,1180);
  setTimeout(function(){
    html2canvas(el,{
-     backgroundColor:'#0d1017', scale:2, useCORS:true, windowWidth:W, width:W, scrollX:0, scrollY:-window.scrollY,
+     backgroundColor:'#ffffff', scale:2, useCORS:true, windowWidth:W, width:W, scrollX:0, scrollY:-window.scrollY,
      onclone:function(doc){
        try{
          doc.querySelectorAll('*').forEach(function(n){ if(n.style){ n.style.backdropFilter='none'; n.style.webkitBackdropFilter='none'; } });
@@ -216,7 +241,7 @@ const MONTHS=[
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
- {name:'Month 1',range:'15 Jun – 15 Jul 2026',has:true,
+ {name:'Month 1',range:'15 Jun - 15 Jul 2026',has:true,
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
   engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
@@ -228,13 +253,17 @@ const MONTHS=[
     fb:{reach:5500,views:10364,visits:329,interactions:66,newFollows:11,posts:3},
     ig:{posts:3,reach:null}},
   enh:[['s-d','✓','Flyer Design'],['s-d','✓','Business Card Design']],
-  extras:[['s-d','✓','Marketing Hub (Client Portal)'],['s-d','✓','Live Job Tracker'],['s-d','✓','Shared Google Drive'],['s-d','✓','Auto-Generated Message Response — Messenger, Instagram &amp; WhatsApp']],
+  extras:[['s-d','✓','Marketing Hub (Client Portal)'],['s-d','✓','Live Job Tracker'],['s-d','✓','Shared Google Drive'],['s-d','✓','Auto-Generated Message Response - Messenger, Instagram &amp; WhatsApp']],
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
- {name:'Month 2',range:'15 Jul – 15 Aug 2026',has:false},
- {name:'Month 3',range:'15 Aug – 15 Sep 2026',has:false},
+ {name:'Month 2',range:'15 Jul - 15 Aug 2026',has:true,fbNow:196,igNow:13,reviews:19,jobs:0,revenue:0,contentPub:0,contentPlan:8,webVisits:null,goals:[['Facebook Followers',196,240,C.blue],['Instagram Followers',13,60,C.purple],['Google Reviews',19,30,C.amber],['Website Visits',0,150,C.teal],['Jobs Logged',0,10,C.green],['Content Published',0,8,C.blue]],stats:{webVisits:null,gbp:{views:null,interactions:null,rating:5.0},wix:{visitors:null,newPct:null,duration:null,bounce:null,fromGoogle:null,forms:null},fb:{reach:null,views:null,visits:null,interactions:null,newFollows:null,posts:null},ig:{posts:null,reach:null}}},
+ {name:'Month 3',range:'15 Aug - 15 Sep 2026',has:false},
 ];
+try{
+ if(MONTHS[0]&&MONTHS[0].start){MONTHS[0].start.fb.linkClicks=0;MONTHS[0].start.wix.fromFacebook=1;MONTHS[0].jobsSrc={google:0,facebook:0,repeat:0,other:0};}
+ if(MONTHS[1]&&MONTHS[1].stats){MONTHS[1].stats.fb.linkClicks=7;MONTHS[1].stats.wix.fromFacebook=6;MONTHS[1].jobsSrc={google:2,facebook:1,repeat:2,other:2};MONTHS[1].expense=5;}
+}catch(e){}
 let mi=1;
 const SCOPE=[
  ['s-d','\u2713','Website Content &amp; UX Refinements'],
@@ -257,13 +286,15 @@ const EXTRAFREE=[
 ];
 
 function jobsThisMonth(){try{const a=JSON.parse(localStorage.getItem('keystart_jobs_v1')||'[]');const ym=new Date().toISOString().slice(0,7);return a.filter(j=>(j.date||'').slice(0,7)===ym).length;}catch(e){return 0;}}
-function statsGroupsHTML(S,isBaseline){
- const v=x=>x==null?'—':Number(x).toLocaleString('en-GB'), dur=s=>s==null?'—':Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s', pc=x=>x==null?'—':v(x)+'%';
+function jobFin(from,to){try{const a=JSON.parse(localStorage.getItem('keystart_jobs_v1')||'[]');const mj=a.filter(j=>{const d=(j.date||'').slice(0,10);return (!from||d>=from)&&(!to||d<=to);});let rev=0,exp=0;mj.forEach(j=>{rev+=parseFloat(j.price)||0;exp+=parseFloat(j.expense)||0;});return {count:mj.length,revenue:rev,expense:exp,profit:rev-exp};}catch(e){return {count:0,revenue:0,expense:0,profit:0};}}
+function statsGroupsHTML(S,isBaseline,M){
+ const v=x=>x==null?'-':Number(x).toLocaleString('en-GB'), dur=s=>s==null?'-':Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s', pc=x=>x==null?'-':v(x)+'%';
  const groups=[
-   ['Website · Wix','#39c5cf',[['Unique visitors',v(S.wix.visitors)],['New visitors',pc(S.wix.newPct)],['Avg. session',dur(S.wix.duration)],['Bounce rate',pc(S.wix.bounce)],['Visits from Google',v(S.wix.fromGoogle)],['Contact forms',v(S.wix.forms)]]],
-   ['Facebook','#58a6ff',[['Reach',v(S.fb.reach)],['Post views',v(S.fb.views)],['Page visits',v(S.fb.visits)],['Content interactions',v(S.fb.interactions)],['New follows',v(S.fb.newFollows)],['Posts published',v(S.fb.posts)]]],
-   ['Instagram','#bc8cff',[['Posts',v(S.ig.posts)],['Reach',v(S.ig.reach)]]],
-   ['Google Business','#d29922',[['Search views',v(S.gbp.views)],['Profile interactions',v(S.gbp.interactions)],['Rating',S.gbp.rating==null?'—':S.gbp.rating.toFixed(1)+'★']]]
+    ['Jobs & revenue','#0E9F6E',[['Jobs logged',v(M?M.jobs:null)],['Revenue tracked',(M&&M.revenue!=null)?('£'+Number(M.revenue).toLocaleString('en-GB')):'-'],['Avg job value',(M&&M.jobs)?('£'+Number(Math.round(M.revenue/M.jobs)).toLocaleString('en-GB')):'-'],['From Google',v(M&&M.jobsSrc?M.jobsSrc.google:null)],['From Facebook',v(M&&M.jobsSrc?M.jobsSrc.facebook:null)],['Repeat customers',v(M&&M.jobsSrc?M.jobsSrc.repeat:null)],['Other',v(M&&M.jobsSrc?M.jobsSrc.other:null)]]],
+   ['Website · Wix','#39c5cf',[['Sessions',v(S.webVisits)],['Unique visitors',v(S.wix.visitors)],['New visitors',pc(S.wix.newPct)],['Avg. session',dur(S.wix.duration)],['Bounce rate',pc(S.wix.bounce)],['Visits from Google',v(S.wix.fromGoogle)],['Contact forms',v(S.wix.forms)],['Visits from Facebook',v(S.wix.fromFacebook)]]],
+   ['Facebook','#58a6ff',[['Reach',v(S.fb.reach)],['Post views',v(S.fb.views)],['Page visits',v(S.fb.visits)],['Content interactions',v(S.fb.interactions)],['New follows',v(S.fb.newFollows)],['Posts published',v(S.fb.posts)],['Followers',v(M?M.fbNow:null)],['Link clicks to site',v(S.fb.linkClicks)]]],
+   ['Instagram','#bc8cff',[['Followers',v(M?M.igNow:null)],['Posts',v(S.ig.posts)],['Reach',v(S.ig.reach)]]],
+   ['Google Business','#d29922',[['Search views',v(S.gbp.views)],['Reviews',v(M?M.reviews:null)],['Profile interactions',v(S.gbp.interactions)],['Rating',S.gbp.rating==null?'-':S.gbp.rating.toFixed(1)+'★']]]
  ];
  return '<div class="startgrid">'+groups.map(g=>
    `<div class="sg"><div class="sgh"><span class="sdot" style="background:${g[1]}"></span>${g[0]}</div>`+
@@ -278,25 +309,33 @@ function renderMonth(){
  document.getElementById('prev').disabled=mi===0;document.getElementById('next').disabled=mi===MONTHS.length-1;
  const wv=isM0?(m.start?m.start.webVisits:null):m.webVisits;
  const webCell=(wv!=null&&wv>0)?[wv,'Visits']:['Live',''];
+ const g3={Website:150,Facebook:220,Instagram:50,Google:25,Jobs:10};
+ const gd=(k,u)=>u;
  const STAT=m.has?[
-   ['s-green','Website',webCell[0],webCell[1]],['s-blue','Facebook',m.fbNow,'Followers'],
-   ['s-purple','Instagram',m.igNow,'Followers'],['s-amber','Google',m.reviews,'Reviews'],
-   ['s-teal','Jobs',jobsVal,'Logged']]
+   ['s-green','Website',webCell[0],gd('Website',webCell[1]||'Visits')],['s-blue','Facebook',m.fbNow,gd('Facebook','Followers')],
+   ['s-purple','Instagram',m.igNow,gd('Instagram','Followers')],['s-amber','Google',m.reviews,gd('Google','Reviews')],
+   ['s-teal','Jobs',jobsVal,gd('Jobs','Logged')]]
   :[['s-green','Website','-','upcoming'],['s-blue','Facebook','-',''],['s-purple','Instagram','-',''],['s-amber','Google','-','Reviews'],['s-teal','Jobs','-','']];
  document.getElementById('stats').innerHTML=STAT.map(s=>`<div class="panel stat ${s[0]}"><div class="ph">${s[1]}</div><div class="v">${s[2]}</div><div class="d">${s[3]}</div></div>`).join('');
+ var _fr=document.getElementById('rowFin');
+ if(_fr){ if(!isM0&&m.has&&m.revenue!=null){ _fr.style.display='';
+   var _fm=function(v){return v==null?'-':'£'+Number(v).toLocaleString('en-GB');};
+   var _exp=m.expense||0, _pft=(m.profit!=null)?m.profit:((m.revenue||0)-_exp);
+   document.getElementById('finGrid').innerHTML=[['Revenue tracked',_fm(m.revenue),'#0E9F6E'],['Expenses',_fm(_exp),'#C77700'],['Profit',_fm(_pft),'#2E6BE6']].map(function(x){return '<div class="sg"><div class="sgh">'+x[0]+'</div><div style="font-size:22px;font-weight:800;color:'+x[2]+'">'+x[1]+'</div></div>';}).join('');
+ } else { _fr.style.display='none'; } }
  const bd=isM0?m.start:m.stats, rowStats=document.getElementById('rowStats');
  if(bd){
    document.getElementById('statsHead').textContent=isM0?'Baseline statistics':'Statistics';
-   document.getElementById('statsBreak').innerHTML=statsGroupsHTML(bd,isM0);
+   document.getElementById('statsBreak').innerHTML=statsGroupsHTML(bd,isM0,m);
    rowStats.style.display='';
  }else{rowStats.style.display='none';}
- document.getElementById('rowSC').style.display=isM0?'none':'';
+ document.getElementById('rowSC').style.display='none';
  document.getElementById('rowIncluded').style.display=isM0?'none':'';
  document.getElementById('rowInfo').style.display=isM0?'':'none';
  if(m.enh&&m.enh.length){document.getElementById('enhWrap').style.display='';document.getElementById('enh').innerHTML=m.enh.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('enhWrap').style.display='none';}
  if(m.extras&&m.extras.length){document.getElementById('extrasWrap').style.display='';document.getElementById('extras2').innerHTML=m.extras.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('extrasWrap').style.display='none';}
- if(!isM0){
-   document.getElementById('goalsHead').textContent='Goals';
+ if(isM0){
+   document.getElementById('goalsHead').textContent='3-Month Goals';
    document.getElementById('goals').innerHTML=m.has?m.goals.map(g=>{const pct=Math.max(2,Math.round(g[1]/g[2]*100));
      return `<div class="goal"><div class="gl"><span class="n">${g[0]}</span><span class="x">${g[1]} / ${g[2]}</span></div><div class="track"><div class="fill" style="width:${Math.min(pct,100)}%;background:${g[3]}">${pct>14?pct+'%':''}</div></div></div>`;}).join('')
      :'<div class="empty">Goals set at the start of the month</div>';
@@ -315,7 +354,7 @@ function applyLive(){
  if(L.rev!=null){m.reviews=L.rev;m.goals[2][1]=L.rev;}
  if(L.wv!=null){m.webVisits=L.wv;m.goals[3][1]=L.wv;}
  if(L.cp!=null){m.contentPub=L.cp;m.goals[5][1]=L.cp;}
- const lj=jobsThisMonth();if(lj>0){m.jobs=lj;m.goals[4][1]=lj;}
+ const fin=jobFin('2026-06-15','2026-07-15');if(fin.count>0){m.jobs=fin.count;m.revenue=fin.revenue;m.expense=fin.expense;m.goals[4][1]=fin.count;}m.profit=(m.revenue||0)-(m.expense||0);
 }
 function stampUpdated(){const L=getLive(),el=document.getElementById('updated');if(el&&L.updated){el.textContent='Updated '+new Date(L.updated).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}}
 function toggleEdit(){const p=document.getElementById('editPanel'),show=p.style.display==='none';if(show){const m=MONTHS[1];document.getElementById('e_fb').value=m.fbNow;document.getElementById('e_ig').value=m.igNow;document.getElementById('e_rev').value=m.reviews;document.getElementById('e_wv').value=m.webVisits;document.getElementById('e_cp').value=m.contentPub;}p.style.display=show?'block':'none';}
@@ -334,6 +373,49 @@ document.getElementById('next').onclick=()=>{if(mi<MONTHS.length-1){mi++;renderM
 document.getElementById('file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById('curM').textContent='Live: '+f.name;};r.readAsText(f);});
 
 renderStatic();applyLive();renderMonth();stampUpdated();
+</script>
+<script>
+(function(){
+  const SRC={1:{jobs:{Google:2,Repeat:2,Facebook:1,Other:2},rev:{Google:540,Repeat:400,Other:230,Facebook:45}}};
+  function webOf(m){return (m.stats&&m.stats.webVisits)||(m.start&&m.start.webVisits)||m.webVisits||null;}
+  window.renderGrowth=function(){
+    var row=document.getElementById('rowCharts'); if(!row||typeof MONTHS==='undefined'||typeof mk!=='function')return;
+    var ci=(typeof mi==='undefined')?1:mi, isM0=ci===0, cur=MONTHS[ci];
+    var _s0=cur?(cur.stats||cur.start):null;if(isM0||!cur||!cur.has||!_s0||(_s0.webVisits==null&&(!_s0.fb||_s0.fb.reach==null)&&(!_s0.gbp||_s0.gbp.views==null))){row.style.display='none';return;}
+    row.style.display='';
+    var idx=[]; for(var i=0;i<=ci;i++){ if(MONTHS[i]&&MONTHS[i].has) idx.push(i); }
+    var labels=idx.map(function(i){return i===0?'Baseline':('Month '+i);});
+    var series=[
+      {label:'Jobs logged',c:C.green,g:function(m){return m.jobs;}},
+      {label:'Google reviews',c:C.amber,g:function(m){return m.reviews;}},
+      {label:'Facebook followers',c:C.blue,g:function(m){return m.fbNow;}},
+      {label:'Instagram followers',c:C.purple,g:function(m){return m.igNow;}},
+      {label:'Website sessions',c:C.teal,g:function(m){return webOf(m);}}
+    ];
+    var dsets=series.map(function(s){return {label:s.label,data:idx.map(function(i){return s.g(MONTHS[i]);}),borderColor:s.c,backgroundColor:s.c,tension:.3,pointRadius:4,borderWidth:2.4,spanGaps:true};});
+    mk('chTrend','line',{labels:labels,datasets:dsets},{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom'},tooltip:TT},scales:yx()});
+    var SVC={1:{'Spare Key':3,'Car Lockout':1,'Lost All Keys':1,'Remote Repair':1,'Ignition Repair':1}};
+    var sv=SVC[ci];
+    if(sv){var sl=Object.keys(sv),svv=sl.map(function(k){return sv[k];});
+      mk('chSvc','doughnut',{labels:sl,datasets:[{data:svv,backgroundColor:[C.blue,C.teal,C.amber,C.purple,'#99A1B0'],borderColor:'#fff',borderWidth:2}]},{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom'},tooltip:TT}});}
+    var statsOf=function(m){return m.stats||m.start;};
+    var b0=statsOf(MONTHS[0]), sN=statsOf(cur);
+    var gp=function(bv,nv){return (nv&&nv>0&&nv>=bv)?Math.round((nv-bv)/nv*100):null;};
+    var gm=[['Facebook reach',gp(b0.fb.reach,sN.fb.reach)],['Facebook views',gp(b0.fb.views,sN.fb.views)],['Website sessions',gp(b0.webVisits,sN.webVisits)],['Instagram followers',gp(MONTHS[0].igNow,cur.igNow)],['Google reviews',gp(MONTHS[0].reviews,cur.reviews)],['Facebook followers',gp(MONTHS[0].fbNow,cur.fbNow)]].filter(function(x){return x[1]!=null;}).sort(function(a,b){return b[1]-a[1];});
+    mk('chGrowth','bar',{labels:gm.map(function(x){return x[0]+'  '+x[1]+'%';}),datasets:[{data:gm.map(function(x){return x[1];}),backgroundColor:C.green,borderRadius:5}]},{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.x+'% is new this month';}}}},scales:{x:{beginAtZero:true,max:100,grid:{color:C.grid},ticks:{callback:function(v){return v+'%';}}},y:{grid:{display:false}}}});
+    var src=SRC[ci], jt=document.getElementById('chJobsTitle'), rt=document.getElementById('chRevTitle');
+    if(src){
+      var jl=Object.keys(src.jobs), jv=jl.map(function(k){return src.jobs[k];});
+      mk('chJobs','doughnut',{labels:jl,datasets:[{data:jv,backgroundColor:[C.blue,C.teal,C.amber,C.muted],borderColor:'#fff',borderWidth:2}]},{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom'},tooltip:TT}});
+      var rl=Object.keys(src.rev), rv=rl.map(function(k){return src.rev[k];});
+      mk('chRev','bar',{labels:rl,datasets:[{data:rv,backgroundColor:[C.blue,C.teal,C.muted,C.amber],borderRadius:5}]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:Object.assign({},TT,{callbacks:{label:function(c){return '£'+c.parsed.y;}}})},scales:{y:{beginAtZero:true,grid:{color:C.grid},border:{display:false},ticks:{callback:function(v){return '£'+v;}}},x:{grid:{display:false},border:{display:false}}}});
+      if(jt)jt.textContent='Jobs by source';
+      if(rt)rt.textContent='Revenue by source (£)';
+    }
+  };
+  if(typeof renderMonth==='function'){var __r=renderMonth;renderMonth=function(){__r.apply(this,arguments);try{window.renderGrowth();}catch(e){}};}
+  try{window.renderGrowth();}catch(e){}
+})();
 </script>
 </body>
 </html>
