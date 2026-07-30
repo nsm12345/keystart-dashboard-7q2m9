@@ -108,7 +108,7 @@
       <div class="mnav"><button id="prev">◀</button><span class="cur" id="curM">Month 0</span><button id="next">▶</button></div>
       <input type="file" id="file" accept=".csv" style="display:none">
       <span id="updated" style="font-size:11px;color:var(--muted)"></span>
-      <button class="btn" id="editBtn" onclick="toggleEdit()">✎ Update figures</button>
+      <button class="btn" id="editBtn" onclick="toggleEdit()" style="display:none">✎ Update figures</button>
       <button class="btn" id="pdfBtn" onclick="savePDF()">⬇ Save as PDF</button>
     </div>
   </div>
@@ -267,7 +267,11 @@ try{
  if(MONTHS[0]&&MONTHS[0].start){MONTHS[0].start.fb.linkClicks=0;MONTHS[0].start.wix.fromFacebook=1;MONTHS[0].jobsSrc={google:0,facebook:0,repeat:0,other:0};}
  if(MONTHS[1]&&MONTHS[1].stats){MONTHS[1].stats.fb.linkClicks=7;MONTHS[1].stats.wix.fromFacebook=6;MONTHS[1].jobsSrc={google:4,facebook:2,repeat:3,other:2};MONTHS[1].expense=160;}
 }catch(e){}
-let mi=1;
+let mi=(function(){
+  function pop(M){return !!(M&&M.has&&((M.jobs>0)||(M.revenue>0)||(M.stats&&(M.stats.webVisits||(M.stats.gbp&&M.stats.gbp.views)))));}
+  for(var i=MONTHS.length-1;i>=1;i--){if(pop(MONTHS[i]))return i;}
+  return 1;
+})();
 const SCOPE=[
  ['s-d','\u2713','Website Content &amp; UX Refinements'],
  ['s-d','\u2713','Basic On-Page SEO Setup'],
@@ -350,16 +354,10 @@ function renderStatic(){
 }
 const LIVE_KEY='keystart_dash_live_v1';
 function getLive(){try{return JSON.parse(localStorage.getItem(LIVE_KEY)||'{}');}catch(e){return {};}}
-function applyLive(){
- const L=getLive(),m=MONTHS[1];
- if(L.fb!=null){m.fbNow=L.fb;m.goals[0][1]=L.fb;}
- if(L.ig!=null){m.igNow=L.ig;m.goals[1][1]=L.ig;}
- if(L.rev!=null){m.reviews=L.rev;m.goals[2][1]=L.rev;}
- if(L.wv!=null){m.webVisits=L.wv;m.goals[3][1]=L.wv;}
- if(L.cp!=null){m.contentPub=L.cp;m.goals[5][1]=L.cp;}
- const fin=jobFin('2026-06-15','2026-07-15');if(fin.count>0){m.jobs=fin.count;m.revenue=fin.revenue;m.expense=fin.expense;m.goals[4][1]=fin.count;}m.profit=(m.revenue||0)-(m.expense||0);
+function applyLive(){ /* deployed (agency) figures are authoritative; recompute profit only */
+ MONTHS.forEach(function(m){if(m&&m.revenue!=null){m.profit=(m.revenue||0)-(m.expense||0);}});
 }
-function stampUpdated(){const L=getLive(),el=document.getElementById('updated');if(el&&L.updated){el.textContent='Updated '+new Date(L.updated).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}}
+function stampUpdated(){var el=document.getElementById('updated');if(!el)return;var M=MONTHS[mi];el.textContent=M?('Reporting period: '+M.name+(M.range?(' ('+M.range+')'):'')):'';}
 function toggleEdit(){const p=document.getElementById('editPanel'),show=p.style.display==='none';if(show){const m=MONTHS[1];document.getElementById('e_fb').value=m.fbNow;document.getElementById('e_ig').value=m.igNow;document.getElementById('e_rev').value=m.reviews;document.getElementById('e_wv').value=m.webVisits;document.getElementById('e_cp').value=m.contentPub;}p.style.display=show?'block':'none';}
 function saveFigures(){const L=getLive(),gv=id=>{const v=document.getElementById(id).value.trim();return v===''?null:Number(v);};const fb=gv('e_fb'),ig=gv('e_ig'),rev=gv('e_rev'),wv=gv('e_wv'),cp=gv('e_cp');if(fb!=null)L.fb=fb;if(ig!=null)L.ig=ig;if(rev!=null)L.rev=rev;if(wv!=null)L.wv=wv;if(cp!=null)L.cp=cp;L.updated=new Date().toISOString();localStorage.setItem(LIVE_KEY,JSON.stringify(L));mi=1;applyLive();renderMonth();stampUpdated();toggleEdit();}
 
@@ -371,8 +369,8 @@ document.getElementById('info').innerHTML=[['Business','Keystart Auto Locksmiths
 document.getElementById('services').innerHTML=['Car Lockouts','Lost Keys','Spare Keys','Key Cutting & Coding','Remote Repairs','All Keys Lost','Van Locks','24/7 Availability'].map(s=>`<span>${s}</span>`).join('');
 document.getElementById('usp').innerHTML=['Non-Destructive','Same-Day','All Makes & Models','Certified Van Locks'].map(s=>`<span>${s}</span>`).join('');
 
-document.getElementById('prev').onclick=()=>{if(mi>0){mi--;renderMonth();}};
-document.getElementById('next').onclick=()=>{if(mi<MONTHS.length-1){mi++;renderMonth();}};
+document.getElementById('prev').onclick=()=>{if(mi>0){mi--;renderMonth();stampUpdated();}};
+document.getElementById('next').onclick=()=>{if(mi<MONTHS.length-1){mi++;renderMonth();stampUpdated();}};
 document.getElementById('file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById('curM').textContent='Live: '+f.name;};r.readAsText(f);});
 
 renderStatic();applyLive();renderMonth();stampUpdated();
@@ -406,7 +404,7 @@ renderStatic();applyLive();renderMonth();stampUpdated();
     var b0=statsOf(MONTHS[0]), sN=statsOf(cur);
     var grows=[['Google reviews',MONTHS[0].reviews,cur.reviews],['Facebook followers',MONTHS[0].fbNow,cur.fbNow],['Instagram followers',MONTHS[0].igNow,cur.igNow],['Website sessions',b0.webVisits,sN.webVisits],['Facebook reach',b0.fb&&b0.fb.reach,sN.fb&&sN.fb.reach],['Facebook views',b0.fb&&b0.fb.views,sN.fb&&sN.fb.views]].filter(function(r){return r[1]!=null&&r[2]!=null;});
     var gbox=document.getElementById('chGrowthBox');
-    if(gbox){var gh='<style>.gtbl{width:100%;border-collapse:collapse;font-size:13px}.gtbl th{text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:2px solid #0E1F3A}.gtbl td{padding:8px 8px;border-bottom:1px solid var(--border)}.gtbl td.gm{font-weight:600;color:#0E1F3A}.gtbl th:not(:first-child),.gtbl td:not(:first-child){text-align:right}.gtbl tr:last-child td{border-bottom:none}</style><table class="gtbl"><thead><tr><th>Metric</th><th>When we started</th><th>Now</th><th>Change</th></tr></thead><tbody>';
+    if(gbox){var gh='<style>.gtbl{width:100%;border-collapse:collapse;font-size:13px}.gtbl th{text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:2px solid #0E1F3A}.gtbl td{padding:8px 8px;border-bottom:1px solid var(--border)}.gtbl td.gm{font-weight:600;color:#0E1F3A}.gtbl th:not(:first-child),.gtbl td:not(:first-child){text-align:right}.gtbl tr:last-child td{border-bottom:none}</style><table class="gtbl"><thead><tr><th>Metric</th><th>START</th><th>Month '+ci+'</th><th>Change</th></tr></thead><tbody>';
       grows.forEach(function(r){var d=r[2]-r[1];var col=d>0?C.green:(d<0?'#C0554E':'var(--muted)');var sg=(d>0?'+':'')+d.toLocaleString();
         gh+='<tr><td class="gm">'+r[0]+'</td><td>'+r[1].toLocaleString()+'</td><td>'+r[2].toLocaleString()+'</td><td style="font-weight:700;color:'+col+'">'+sg+'</td></tr>';});
       gh+='</tbody></table>';gbox.innerHTML=gh;}
