@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="robots" content="noindex, nofollow"/>
-<title>Keystart - Marketing Overview</title>
+<title>Keystart Marketing Overview</title>
 <meta name="theme-color" content="#0E1F3A">
 <link rel="icon" type="image/png" href="keystart-icon-192.png">
 <link rel="apple-touch-icon" href="keystart-icon-192.png">
@@ -78,6 +78,9 @@
 .sgr b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
 .sgnote{font-size:10px;color:var(--muted);margin-top:6px;font-style:italic}
 .startcap{font-size:10.5px;color:var(--muted);text-align:center;margin-top:11px;letter-spacing:.02em}
+.tlegend{display:flex;flex-wrap:wrap;justify-content:center;gap:7px 16px;max-width:360px;margin:10px auto 0}
+.tlegend span{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#5b6675}
+.tlegend i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:0 0 auto}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Pinyon+Script&display=swap" rel="stylesheet"><style id="ks-navbar">
 #ksnav{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid #e6ebf2;
@@ -103,7 +106,7 @@
 </div>
 <div class="wrap">
   <div class="top">
-    <div class="tl"><div><h1>Keystart Auto Locksmiths</h1><div class="sub">Marketing Overview</div></div></div>
+    <div class="tl"><div><h1>Marketing Overview</h1></div></div>
     <div class="tr">
       <div class="mnav"><button id="prev">◀</button><span class="cur" id="curM">Month 0</span><button id="next">▶</button></div>
       <input type="file" id="file" accept=".csv" style="display:none">
@@ -115,14 +118,14 @@
 
   <div class="row r5" id="stats"></div>
   <div class="row" id="rowFin" style="grid-template-columns:1fr;display:none">
-    <div class="panel"><div class="ph">Revenue &amp; profit <span style="color:var(--muted)">FROM JOB TRACKER</span></div>
+    <div class="panel"><div class="ph">Revenue &amp; Profit <span style="color:var(--muted)">FROM JOB TRACKER</span></div>
       <div class="startgrid" id="finGrid"></div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px">Revenue and per job costs come from your Job Tracker. Profit = revenue - expenses.</div>
     </div>
   </div>
 
   <div class="panel" id="editPanel" style="display:none;margin-bottom:12px">
-    <div class="ph">Update current figures <span style="color:var(--muted)">- type today's numbers, saved on this device</span></div>
+    <div class="ph">Update Current Figures <span style="color:var(--muted)">type today's numbers, saved on this device</span></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
       <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Facebook followers<input type="number" id="e_fb" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
       <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Instagram followers<input type="number" id="e_ig" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
@@ -141,19 +144,22 @@
     <div class="panel"><div class="ph" id="statsHead">Statistics</div><div id="statsBreak"></div></div>
   </div>
   <div class="row" id="rowCharts" style="grid-template-columns:1fr">
-    <div class="panel"><div class="ph">Growth &amp; breakdowns</div>
+    <div class="panel"><div class="ph">Growth &amp; Breakdowns</div>
       <div class="cgrid2">
-        <div class="cbox"><div class="ct">CHANGE SINCE WE STARTED (actual numbers)</div><div id="chGrowthBox" style="min-height:190px"></div></div>
-        <div class="cbox"><div class="ct">Growth over time</div><div class="cw"><canvas id="chTrend"></canvas></div></div>
+        <div class="cbox"><div class="ct">Change Over Time</div><div id="chGrowthBox" style="min-height:190px"></div></div>
+        <div class="cbox"><div class="ct">Growth Over Time</div><div class="cw"><canvas id="chTrend"></canvas></div><div id="trendLegend" class="tlegend"></div></div>
       </div>
-      <div class="cgrid3">
-        <div class="cbox"><div class="ct">Services delivered</div><div class="cw"><canvas id="chSvc"></canvas></div></div>
-        <div class="cbox"><div class="ct" id="chJobsTitle">Jobs by source</div><div class="cw"><canvas id="chJobs"></canvas></div></div>
-        <div class="cbox"><div class="ct" id="chRevTitle">Revenue by source (£)</div><div class="cw"><canvas id="chRev"></canvas></div></div>
+      <div class="cgrid2">
+        <div class="cbox" id="boxJobs"><div class="ct" id="chJobsTitle">Jobs By Source</div><div class="cw"><canvas id="chJobs"></canvas></div></div>
+        <div class="cbox" id="boxQrScans"><div class="ct">QR Scans By Printed Item</div><div class="cw"><canvas id="chQrScans"></canvas></div></div>
       </div>
-      <div class="cgrid2" id="qrRow" style="margin-top:14px">
-        <div class="cbox"><div class="ct">QR scans by printed item</div><div class="cw"><canvas id="chQrScans"></canvas></div></div>
-        <div class="cbox"><div class="ct">What visitors tapped after scanning</div><div class="cw"><canvas id="chQrClicks"></canvas></div></div>
+      <div class="cgrid2">
+        <div class="cbox" id="boxRev"><div class="ct" id="chRevTitle">Revenue By Source (£)</div><div class="cw"><canvas id="chRev"></canvas></div></div>
+        <div class="cbox"><div class="ct">Services Delivered</div><div class="cw"><canvas id="chSvc"></canvas></div></div>
+      </div>
+      <div class="cgrid2">
+        <div class="cbox" id="boxWebSrc"><div class="ct">Website Traffic By Source</div><div class="cw"><canvas id="chWebSrc"></canvas></div></div>
+        <div class="cbox" id="boxQrClicks"><div class="ct">What Visitors Tapped After Scanning</div><div class="cw"><canvas id="chQrClicks"></canvas></div></div>
       </div>
     </div>
   </div>
@@ -163,13 +169,13 @@
   </div>
 
   <div class="row" id="rowIncluded">
-    <div class="panel"><div class="ph">What's included this month <span style="color:var(--muted)">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul>
+    <div class="panel"><div class="ph">What's Included This Month <span style="color:var(--muted)" id="scopeLabel">LAUNCH SUITE</span></div><ul class="scope" id="scope"></ul>
       <div id="enhWrap"><div class="ph" style="margin-top:14px">ENHANCEMENTS</div><ul class="scope" id="enh"></ul></div>
-      <div id="extrasWrap"><div class="ph" style="margin-top:14px">EXTRAS - INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div></div>
+      <div id="extrasWrap"><div class="ph" style="margin-top:14px">EXTRAS INCLUDED AT NO CHARGE</div><ul class="scope" id="extras2"></ul></div></div>
   </div>
 
   <div class="row" id="rowInfo" style="grid-template-columns:1fr">
-    <div class="panel"><div class="ph">Key business information</div><div class="kv" id="info"></div></div>
+    <div class="panel"><div class="ph">Key Business Information</div><div class="kv" id="info"></div></div>
     <div class="panel"><div class="ph">Key Services</div><div class="svc" id="services"></div><div class="chips" id="usp" style="margin-top:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div></div>
   </div>
 
@@ -189,7 +195,7 @@ Chart.defaults.plugins.legend.labels.usePointStyle=true;Chart.defaults.plugins.l
 const TT={backgroundColor:'#000',padding:9,cornerRadius:7,borderColor:'#262c36',borderWidth:1};
 const yx=()=>({y:{beginAtZero:true,grid:{color:C.grid},border:{display:false},ticks:{maxTicksLimit:5}},x:{grid:{display:false},border:{display:false}}});
 const charts={};
-function mk(id,t,d,o){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),{type:t,data:d,options:o});}
+function mk(id,t,d,o,p){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),{type:t,data:d,options:o,plugins:p||[]});}
 
 function savePDF(){
  const el=document.querySelector('.wrap');
@@ -219,7 +225,7 @@ function savePDF(){
      const url=pdf.output('bloburl');
      if(win && !win.closed){ win.location.href=url; }
      pdf.save('Keystart-Marketing-Overview.pdf');
-     reset('\u2713 Saved \u2014 check Downloads');
+     reset('\u2713 Saved, check Downloads');
      setTimeout(function(){ reset(); }, 3000);
    }).catch(function(err){
      if(win && !win.closed) win.close();
@@ -248,24 +254,36 @@ const MONTHS=[
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
   engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
-  fbNow:196,igNow:13,reviews:19,jobs:11,revenue:2045,contentPub:0,contentPlan:8,webVisits:80,
-  goals:[['Facebook Followers',196,220,C.blue],['Instagram Followers',13,50,C.purple],['Google Reviews',19,25,C.amber],['Website Visits',80,150,C.teal],['Jobs Logged',11,10,C.green],['Content Published',3,8,C.blue]],
-  stats:{webVisits:80,
+  fbNow:196,igNow:13,reviews:19,jobs:11,revenue:2045,contentPub:0,contentPlan:8,webVisits:86,
+  goals:[['Facebook Followers',196,220,C.blue],['Instagram Followers',13,50,C.purple],['Google Reviews',19,25,C.amber],['Website Visits',86,150,C.teal],['Jobs Logged',11,10,C.green],['Content Published',3,8,C.blue]],
+  stats:{webVisits:86,
     gbp:{views:221,interactions:104,rating:5.0},
-    wix:{visitors:61,newPct:97,duration:61,bounce:73,fromGoogle:34,forms:3},
+    wix:{visitors:65,newPct:97,duration:61,bounce:73,fromGoogle:48,forms:3},
     fb:{reach:5500,views:10364,visits:329,interactions:66,newFollows:11,posts:3},
-    ig:{posts:3,reach:null}},
+    ig:{posts:3,reach:null},gsc:{clicks:41,impressions:3690,ctr:1.1,position:23.5}},
   enh:[['s-d','✓','Flyer Design'],['s-d','✓','Business Card Design']],
-  extras:[['s-d','✓','Marketing Hub (Client Portal)'],['s-d','✓','Live Job Tracker'],['s-d','✓','Shared Google Drive'],['s-d','✓','Auto-Generated Message Response - Messenger, Instagram &amp; WhatsApp']],
+  extras:[['s-d','✓','Marketing Hub (Client Portal)'],['s-d','✓','Live Job Tracker'],['s-d','✓','Shared Google Drive'],['s-d','✓','Auto-Generated Message Response for Messenger, Instagram &amp; WhatsApp']],
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
- {name:'Month 2',range:'15 Jul - 15 Aug 2026',has:true,fbNow:196,igNow:13,reviews:19,jobs:0,revenue:0,contentPub:0,contentPlan:8,webVisits:null,goals:[['Facebook Followers',196,240,C.blue],['Instagram Followers',13,60,C.purple],['Google Reviews',19,30,C.amber],['Website Visits',0,150,C.teal],['Jobs Logged',0,10,C.green],['Content Published',0,8,C.blue]],stats:{webVisits:null,gbp:{views:null,interactions:null,rating:5.0},wix:{visitors:null,newPct:null,duration:null,bounce:null,fromGoogle:null,forms:null},fb:{reach:null,views:null,visits:null,interactions:null,newFollows:null,posts:null},ig:{posts:null,reach:null}}},
+ {name:'Month 2',range:'15 Jul - 15 Aug 2026',has:true,
+  scopeLabel:'ELEVATE SUITE',
+  scope:[
+   ['s-d','✓','Full Website Improvements Within Wix Capabilities'],
+   ['s-d','✓','Enhanced On-Page &amp; Technical SEO Optimisation'],
+   ['s-d','✓','Detailed Monthly Analytics &amp; Growth Insights'],
+   ['s-d','✓','Setup &amp; Optimisation For 4 Social Media Platforms'],
+   ['s-d','✓','Content Scheduling &amp; Posting Management'],
+   ['s-d','✓','8 Branded Social Media Posts Per Month'],
+   ['s-d','✓','4 Short Video Reels Per Month'],
+   ['s-d','✓','Competitor &amp; Keyword Review'],
+  ],
+  fbNow:196,igNow:13,reviews:19,jobs:0,revenue:0,contentPub:0,contentPlan:8,webVisits:null,goals:[['Facebook Followers',196,240,C.blue],['Instagram Followers',13,60,C.purple],['Google Reviews',19,30,C.amber],['Website Visits',0,150,C.teal],['Jobs Logged',0,10,C.green],['Content Published',0,8,C.blue]],stats:{webVisits:null,gbp:{views:null,interactions:null,rating:5.0},wix:{visitors:null,newPct:null,duration:null,bounce:null,fromGoogle:null,forms:null},fb:{reach:null,views:null,visits:null,interactions:null,newFollows:null,posts:null},ig:{posts:null,reach:null}}},
  {name:'Month 3',range:'15 Aug - 15 Sep 2026',has:false},
 ];
 try{
  if(MONTHS[0]&&MONTHS[0].start){MONTHS[0].start.fb.linkClicks=0;MONTHS[0].start.wix.fromFacebook=1;MONTHS[0].jobsSrc={google:0,facebook:0,repeat:0,other:0};}
- if(MONTHS[1]&&MONTHS[1].stats){MONTHS[1].stats.fb.linkClicks=7;MONTHS[1].stats.wix.fromFacebook=6;MONTHS[1].jobsSrc={google:4,facebook:2,repeat:3,other:2};MONTHS[1].expense=160;}
+ if(MONTHS[1]&&MONTHS[1].stats){MONTHS[1].stats.fb.linkClicks=7;MONTHS[1].stats.wix.fromFacebook=6;MONTHS[1].jobsSrc={google:4,facebook:2,repeat:3,other:2};MONTHS[1].expense=160;MONTHS[1].trafficSrc={Google:48,Direct:27,Facebook:6,Other:5};}
 }catch(e){}
 let mi=(function(){
   function pop(M){return !!(M&&M.has&&((M.jobs>0)||(M.revenue>0)||(M.stats&&(M.stats.webVisits||(M.stats.gbp&&M.stats.gbp.views)))));}
@@ -289,7 +307,7 @@ const EXTRAFREE=[
  ['s-d','\u2713','Marketing Hub (Client Portal)'],
  ['s-d','\u2713','Live Job Tracker'],
  ['s-d','\u2713','Shared Google Drive'],
- ['s-d','\u2713','Auto-Generated Message Response \u2014 Messenger, Instagram &amp; WhatsApp'],
+ ['s-d','\u2713','Auto-Generated Message Response for Messenger, Instagram &amp; WhatsApp'],
 ];
 
 function jobsThisMonth(){try{const a=JSON.parse(localStorage.getItem('keystart_jobs_v1')||'[]');const ym=new Date().toISOString().slice(0,7);return a.filter(j=>(j.date||'').slice(0,7)===ym).length;}catch(e){return 0;}}
@@ -297,11 +315,11 @@ function jobFin(from,to){try{const a=JSON.parse(localStorage.getItem('keystart_j
 function statsGroupsHTML(S,isBaseline,M){
  const v=x=>x==null?'-':Number(x).toLocaleString('en-GB'), dur=s=>s==null?'-':Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s', pc=x=>x==null?'-':v(x)+'%';
  const groups=[
-    ['Jobs & revenue','#0E9F6E',[['Jobs logged',v(M?M.jobs:null)],['Revenue tracked',(M&&M.revenue!=null)?('£'+Number(M.revenue).toLocaleString('en-GB')):'-'],['Avg job value',(M&&M.jobs)?('£'+Number(Math.round(M.revenue/M.jobs)).toLocaleString('en-GB')):'-'],['From Google',v(M&&M.jobsSrc?M.jobsSrc.google:null)],['From Facebook',v(M&&M.jobsSrc?M.jobsSrc.facebook:null)],['Repeat customers',v(M&&M.jobsSrc?M.jobsSrc.repeat:null)],['Other',v(M&&M.jobsSrc?M.jobsSrc.other:null)]]],
-   ['Website · Wix','#39c5cf',[['Sessions',v(S.webVisits)],['Unique visitors',v(S.wix.visitors)],['New visitors',pc(S.wix.newPct)],['Avg. session',dur(S.wix.duration)],['Bounce rate',pc(S.wix.bounce)],['Visits from Google',v(S.wix.fromGoogle)],['Contact forms',v(S.wix.forms)],['Visits from Facebook',v(S.wix.fromFacebook)]]],
-   ['Facebook','#58a6ff',[['Reach',v(S.fb.reach)],['Post views',v(S.fb.views)],['Page visits',v(S.fb.visits)],['Content interactions',v(S.fb.interactions)],['New follows',v(S.fb.newFollows)],['Posts published',v(S.fb.posts)],['Followers',v(M?M.fbNow:null)],['Link clicks to site',v(S.fb.linkClicks)]]],
+    ['Jobs & Revenue','#0E9F6E',[['Jobs Logged',v(M?M.jobs:null)],['Revenue Tracked',(M&&M.revenue!=null)?('£'+Number(M.revenue).toLocaleString('en-GB')):'-'],['Avg Job Value',(M&&M.jobs)?('£'+Number(Math.round(M.revenue/M.jobs)).toLocaleString('en-GB')):'-'],['From Google',v(M&&M.jobsSrc?M.jobsSrc.google:null)],['From Facebook',v(M&&M.jobsSrc?M.jobsSrc.facebook:null)],['Repeat Customers',v(M&&M.jobsSrc?M.jobsSrc.repeat:null)],['Other',v(M&&M.jobsSrc?M.jobsSrc.other:null)]]],
+   ['Website · Wix','#39c5cf',[['Sessions',v(S.webVisits)],['Unique Visitors',v(S.wix.visitors)],['New Visitors',pc(S.wix.newPct)],['Avg. Session',dur(S.wix.duration)],['Bounce Rate',pc(S.wix.bounce)],['Visits From Google',v(S.wix.fromGoogle)],['Contact Forms',v(S.wix.forms)],['Visits From Facebook',v(S.wix.fromFacebook)]]],
+   ['Facebook','#58a6ff',[['Reach',v(S.fb.reach)],['Post Views',v(S.fb.views)],['Page Visits',v(S.fb.visits)],['Content Interactions',v(S.fb.interactions)],['New Follows',v(S.fb.newFollows)],['Posts Published',v(S.fb.posts)],['Followers',v(M?M.fbNow:null)],['Link Clicks To Site',v(S.fb.linkClicks)]]],
    ['Instagram','#bc8cff',[['Followers',v(M?M.igNow:null)],['Posts',v(S.ig.posts)],['Reach',v(S.ig.reach)]]],
-   ['Google Business','#d29922',[['Search views',v(S.gbp.views)],['Reviews',v(M?M.reviews:null)],['Profile interactions',v(S.gbp.interactions)],['Rating',S.gbp.rating==null?'-':S.gbp.rating.toFixed(1)+'★']]]
+   ['Google Business','#d29922',[['Search Views',v(S.gbp.views)],['Reviews',v(M?M.reviews:null)],['Profile Interactions',v(S.gbp.interactions)],['Rating',S.gbp.rating==null?'-':S.gbp.rating.toFixed(1)+'★']]],['Google Search','#4285F4',[['Clicks',v(S.gsc?S.gsc.clicks:null)],['Impressions',v(S.gsc?S.gsc.impressions:null)],['CTR',(S.gsc&&S.gsc.ctr!=null)?S.gsc.ctr+'%':'-'],['Avg. Position',(S.gsc&&S.gsc.position!=null)?S.gsc.position:'-']]]
  ];
  return '<div class="startgrid">'+groups.map(g=>
    `<div class="sg"><div class="sgh"><span class="sdot" style="background:${g[1]}"></span>${g[0]}</div>`+
@@ -328,11 +346,11 @@ function renderMonth(){
  if(_fr){ if(!isM0&&m.has&&m.revenue!=null){ _fr.style.display='';
    var _fm=function(v){return v==null?'-':'£'+Number(v).toLocaleString('en-GB');};
    var _exp=m.expense||0, _pft=(m.profit!=null)?m.profit:((m.revenue||0)-_exp);
-   document.getElementById('finGrid').innerHTML=[['Revenue tracked',_fm(m.revenue),'#0E9F6E'],['Expenses',_fm(_exp),'#C77700'],['Profit',_fm(_pft),'#2E6BE6']].map(function(x){return '<div class="sg"><div class="sgh">'+x[0]+'</div><div style="font-size:22px;font-weight:800;color:'+x[2]+'">'+x[1]+'</div></div>';}).join('');
+   document.getElementById('finGrid').innerHTML=[['Revenue Tracked',_fm(m.revenue),'#0E9F6E'],['Expenses',_fm(_exp),'#C77700'],['Profit',_fm(_pft),'#2E6BE6']].map(function(x){return '<div class="sg"><div class="sgh">'+x[0]+'</div><div style="font-size:22px;font-weight:800;color:'+x[2]+'">'+x[1]+'</div></div>';}).join('');
  } else { _fr.style.display='none'; } }
  const bd=isM0?m.start:m.stats, rowStats=document.getElementById('rowStats');
  if(bd){
-   document.getElementById('statsHead').textContent=isM0?'Baseline statistics':'Statistics';
+   document.getElementById('statsHead').textContent=isM0?'Baseline Statistics':'Statistics';
    document.getElementById('statsBreak').innerHTML=statsGroupsHTML(bd,isM0,m);
    rowStats.style.display='';
  }else{rowStats.style.display='none';}
@@ -341,6 +359,7 @@ function renderMonth(){
  document.getElementById('rowInfo').style.display=isM0?'':'none';
  if(m.enh&&m.enh.length){document.getElementById('enhWrap').style.display='';document.getElementById('enh').innerHTML=m.enh.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('enhWrap').style.display='none';}
  if(m.extras&&m.extras.length){document.getElementById('extrasWrap').style.display='';document.getElementById('extras2').innerHTML=m.extras.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('extrasWrap').style.display='none';}
+ var _sc=(m.scope&&m.scope.length)?m.scope:SCOPE;var _scEl=document.getElementById('scope');if(_scEl)_scEl.innerHTML=_sc.map(function(s){return '<li><span class="ck '+s[0]+'">'+s[1]+'</span><span>'+s[2]+'</span></li>';}).join('');var _scL=document.getElementById('scopeLabel');if(_scL)_scL.textContent=m.scopeLabel||'LAUNCH SUITE';
  if(isM0){
    document.getElementById('goalsHead').textContent='3-Month Goals';
    document.getElementById('goals').innerHTML=m.has?m.goals.map(g=>{const pct=Math.max(2,Math.round(g[1]/g[2]*100));
@@ -357,7 +376,7 @@ function getLive(){try{return JSON.parse(localStorage.getItem(LIVE_KEY)||'{}');}
 function applyLive(){ /* deployed (agency) figures are authoritative; recompute profit only */
  MONTHS.forEach(function(m){if(m&&m.revenue!=null){m.profit=(m.revenue||0)-(m.expense||0);}});
 }
-function stampUpdated(){var el=document.getElementById('updated');if(!el)return;var M=MONTHS[mi];el.textContent=M?('Reporting period: '+M.name+(M.range?(' ('+M.range+')'):'')):'';}
+function stampUpdated(){var el=document.getElementById('updated');if(!el)return;el.textContent='';}
 function toggleEdit(){const p=document.getElementById('editPanel'),show=p.style.display==='none';if(show){const m=MONTHS[1];document.getElementById('e_fb').value=m.fbNow;document.getElementById('e_ig').value=m.igNow;document.getElementById('e_rev').value=m.reviews;document.getElementById('e_wv').value=m.webVisits;document.getElementById('e_cp').value=m.contentPub;}p.style.display=show?'block':'none';}
 function saveFigures(){const L=getLive(),gv=id=>{const v=document.getElementById(id).value.trim();return v===''?null:Number(v);};const fb=gv('e_fb'),ig=gv('e_ig'),rev=gv('e_rev'),wv=gv('e_wv'),cp=gv('e_cp');if(fb!=null)L.fb=fb;if(ig!=null)L.ig=ig;if(rev!=null)L.rev=rev;if(wv!=null)L.wv=wv;if(cp!=null)L.cp=cp;L.updated=new Date().toISOString();localStorage.setItem(LIVE_KEY,JSON.stringify(L));mi=1;applyLive();renderMonth();stampUpdated();toggleEdit();}
 
@@ -378,7 +397,8 @@ renderStatic();applyLive();renderMonth();stampUpdated();
 <script>
 (function(){
   const SRC={1:{jobs:{Google:4,Repeat:3,Facebook:2,Other:2},rev:{Google:720,Repeat:750,Other:230,Facebook:345}}};
-  const QR={1:{scans:{'QR \u2013 existing print':16,'QR \u2013 flyer':5,'QR \u2013 business card':9},clicks:{'Website':4,'Instagram':1,'Facebook':3,'Google review':0,'Call':0,'WhatsApp':0}}};
+  const QR={1:{scans:{'Flyer':5,'Business Card':9},clicks:{'Website':4,'Instagram':1,'Facebook':3,'Google Review':0,'Call':0,'WhatsApp':0}}};
+  const valueLabels={id:'vlbl',afterDatasetsDraw:function(chart){var ctx=chart.ctx;chart.data.datasets.forEach(function(ds,di){var meta=chart.getDatasetMeta(di);meta.data.forEach(function(bar,i){var v=ds.data[i];if(v==null)return;ctx.save();ctx.fillStyle='#0E1F3A';ctx.font='700 12px Segoe UI, Arial';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(String(v),bar.x,bar.y-4);ctx.restore();});});}};
   function webOf(m){return (m.stats&&m.stats.webVisits)||(m.start&&m.start.webVisits)||m.webVisits||null;}
   window.renderGrowth=function(){
     var row=document.getElementById('rowCharts'); if(!row||typeof MONTHS==='undefined'||typeof mk!=='function')return;
@@ -388,43 +408,56 @@ renderStatic();applyLive();renderMonth();stampUpdated();
     var idx=[]; for(var i=0;i<=ci;i++){ if(MONTHS[i]&&MONTHS[i].has) idx.push(i); }
     var labels=idx.map(function(i){return i===0?'Baseline':('Month '+i);});
     var series=[
-      {label:'Jobs logged',c:C.green,g:function(m){return m.jobs;}},
-      {label:'Google reviews',c:C.amber,g:function(m){return m.reviews;}},
-      {label:'Facebook followers',c:C.blue,g:function(m){return m.fbNow;}},
-      {label:'Instagram followers',c:C.purple,g:function(m){return m.igNow;}},
-      {label:'Website sessions',c:C.teal,g:function(m){return webOf(m);}}
+      {label:'Jobs Logged',c:C.green,g:function(m){return m.jobs;}},
+      {label:'Google Reviews',c:C.amber,g:function(m){return m.reviews;}},
+      {label:'Facebook Followers',c:C.blue,g:function(m){return m.fbNow;}},
+      {label:'Instagram Followers',c:C.purple,g:function(m){return m.igNow;}},
+      {label:'Website Sessions',c:C.teal,g:function(m){return webOf(m);}}
     ];
     var dsets=series.map(function(s){return {label:s.label,data:idx.map(function(i){return s.g(MONTHS[i]);}),borderColor:s.c,backgroundColor:s.c,tension:.3,pointRadius:4,borderWidth:2.4,spanGaps:true};});
-    mk('chTrend','line',{labels:labels,datasets:dsets},{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom'},tooltip:TT},scales:yx()});
+    mk('chTrend','line',{labels:labels,datasets:dsets},{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:TT},scales:yx()});
+    var _tl=document.getElementById('trendLegend'); if(_tl){_tl.innerHTML=series.map(function(s){return '<span><i style="background:'+s.c+'"></i>'+s.label+'</span>';}).join('');}
     var SVC={1:{'Spare Key':3,'Car Lockout':3,'Ignition Repair':3,'Remote Repair':1,'Lost All Keys':1}};
     var sv=SVC[ci];
     if(sv){var sl=Object.keys(sv),svv=sl.map(function(k){return sv[k];});
       mk('chSvc','doughnut',{labels:sl,datasets:[{data:svv,backgroundColor:[C.blue,C.teal,C.amber,C.purple,'#99A1B0'],borderColor:'#fff',borderWidth:2}]},{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom'},tooltip:TT}});}
     var statsOf=function(m){return m.stats||m.start;};
     var b0=statsOf(MONTHS[0]), sN=statsOf(cur);
-    var grows=[['Google reviews',MONTHS[0].reviews,cur.reviews],['Facebook followers',MONTHS[0].fbNow,cur.fbNow],['Instagram followers',MONTHS[0].igNow,cur.igNow],['Website sessions',b0.webVisits,sN.webVisits],['Facebook reach',b0.fb&&b0.fb.reach,sN.fb&&sN.fb.reach],['Facebook views',b0.fb&&b0.fb.views,sN.fb&&sN.fb.views]].filter(function(r){return r[1]!=null&&r[2]!=null;});
+    var grows=[['Google Reviews',MONTHS[0].reviews,cur.reviews],['Facebook Followers',MONTHS[0].fbNow,cur.fbNow],['Instagram Followers',MONTHS[0].igNow,cur.igNow],['Website Sessions',b0.webVisits,sN.webVisits],['Facebook Reach',b0.fb&&b0.fb.reach,sN.fb&&sN.fb.reach],['Facebook Views',b0.fb&&b0.fb.views,sN.fb&&sN.fb.views]].filter(function(r){return r[1]!=null&&r[2]!=null;});
     var gbox=document.getElementById('chGrowthBox');
-    if(gbox){var gh='<style>.gtbl{width:100%;border-collapse:collapse;font-size:13px}.gtbl th{text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:2px solid #0E1F3A}.gtbl td{padding:8px 8px;border-bottom:1px solid var(--border)}.gtbl td.gm{font-weight:600;color:#0E1F3A}.gtbl th:not(:first-child),.gtbl td:not(:first-child){text-align:right}.gtbl tr:last-child td{border-bottom:none}</style><table class="gtbl"><thead><tr><th>Metric</th><th>START</th><th>Month '+ci+'</th><th>Change</th></tr></thead><tbody>';
+    if(gbox){var gh='<style>.gtbl{width:100%;border-collapse:collapse;font-size:13px}.gtbl th{text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:2px solid #0E1F3A}.gtbl td{padding:8px 8px;border-bottom:1px solid var(--border)}.gtbl td.gm{font-weight:600;color:#0E1F3A}.gtbl th:not(:first-child),.gtbl td:not(:first-child){text-align:right}.gtbl tr:last-child td{border-bottom:none}</style><table class="gtbl"><thead><tr><th>Metric</th><th>Baseline</th><th>Month '+ci+'</th><th>Change</th></tr></thead><tbody>';
       grows.forEach(function(r){var d=r[2]-r[1];var col=d>0?C.green:(d<0?'#C0554E':'var(--muted)');var sg=(d>0?'+':'')+d.toLocaleString();
         gh+='<tr><td class="gm">'+r[0]+'</td><td>'+r[1].toLocaleString()+'</td><td>'+r[2].toLocaleString()+'</td><td style="font-weight:700;color:'+col+'">'+sg+'</td></tr>';});
       gh+='</tbody></table>';gbox.innerHTML=gh;}
     var src=SRC[ci], jt=document.getElementById('chJobsTitle'), rt=document.getElementById('chRevTitle');
-    if(src){
+    var _bj=document.getElementById('boxJobs'), _br=document.getElementById('boxRev');
+    if(src){ if(_bj)_bj.style.display=''; if(_br)_br.style.display='';
       var jl=Object.keys(src.jobs), jv=jl.map(function(k){return src.jobs[k];});
       mk('chJobs','doughnut',{labels:jl,datasets:[{data:jv,backgroundColor:[C.blue,C.teal,C.amber,C.muted],borderColor:'#fff',borderWidth:2}]},{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom'},tooltip:TT}});
       var rl=Object.keys(src.rev), rv=rl.map(function(k){return src.rev[k];});
       mk('chRev','bar',{labels:rl,datasets:[{data:rv,backgroundColor:[C.blue,C.teal,C.muted,C.amber],borderRadius:5}]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:Object.assign({},TT,{callbacks:{label:function(c){return '£'+c.parsed.y;}}})},scales:{y:{beginAtZero:true,grid:{color:C.grid},border:{display:false},ticks:{callback:function(v){return '£'+v;}}},x:{grid:{display:false},border:{display:false}}}});
-      if(jt)jt.textContent='Jobs by source';
-      if(rt)rt.textContent='Revenue by source (£)';
-    }
-    var qr=QR[ci], qrRow=document.getElementById('qrRow');
-    if(qr){ if(qrRow)qrRow.style.display='';
-      var barSc={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:TT},scales:{y:{beginAtZero:true,ticks:{precision:0},grid:{color:C.grid}},x:{grid:{display:false}}}};
+      if(jt)jt.textContent='Jobs By Source';
+      if(rt)rt.textContent='Revenue By Source (£)';
+    } else { if(_bj)_bj.style.display='none'; if(_br)_br.style.display='none'; }
+    var qr=QR[ci];
+    var _qs=document.getElementById('boxQrScans'), _qc=document.getElementById('boxQrClicks');
+    if(qr){ if(_qs)_qs.style.display=''; if(_qc)_qc.style.display='';
+      var barSc={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:TT},scales:{y:{beginAtZero:true,grace:'25%',ticks:{precision:0,stepSize:1},grid:{color:C.grid}},x:{grid:{display:false}}}};
       var ql=Object.keys(qr.scans), qv=ql.map(function(k){return qr.scans[k];});
       mk('chQrScans','bar',{labels:ql,datasets:[{data:qv,backgroundColor:[C.blue,C.teal,C.amber],borderRadius:5}]},barSc);
       var cl=Object.keys(qr.clicks), cv=cl.map(function(k){return qr.clicks[k];});
       mk('chQrClicks','bar',{labels:cl,datasets:[{data:cv,backgroundColor:C.blue,borderRadius:5}]},barSc);
-    } else if(qrRow){ qrRow.style.display='none'; }
+    } else { if(_qs)_qs.style.display='none'; if(_qc)_qc.style.display='none'; }
+    var _bw=document.getElementById('boxWebSrc');
+    var ts=cur.trafficSrc;
+    var wx=(sN&&sN.wix)?sN.wix:null;
+    if(ts){ if(_bw)_bw.style.display='';
+      var tl=Object.keys(ts), tv=tl.map(function(k){return ts[k];});
+      mk('chWebSrc','doughnut',{labels:tl,datasets:[{data:tv,backgroundColor:[C.amber,C.muted,C.blue,'#99A1B0'],borderColor:'#fff',borderWidth:2}]},{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom'},tooltip:TT}});
+    } else if(wx&&wx.visitors!=null){ if(_bw)_bw.style.display='';
+      var wg=wx.fromGoogle||0, wf=wx.fromFacebook||0, wd=Math.max(0,(wx.visitors||0)-wg-wf);
+      mk('chWebSrc','doughnut',{labels:['Google','Facebook','Direct'],datasets:[{data:[wg,wf,wd],backgroundColor:[C.amber,C.blue,C.muted],borderColor:'#fff',borderWidth:2}]},{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom'},tooltip:TT}});
+    } else { if(_bw)_bw.style.display='none'; }
   };
   if(typeof renderMonth==='function'){var __r=renderMonth;renderMonth=function(){__r.apply(this,arguments);try{window.renderGrowth();}catch(e){}};}
   try{window.renderGrowth();}catch(e){}
