@@ -111,7 +111,6 @@
       <div class="mnav"><button id="prev">◀</button><span class="cur" id="curM">Month 0</span><button id="next">▶</button></div>
       <input type="file" id="file" accept=".csv" style="display:none">
       <span id="updated" style="font-size:11px;color:var(--muted)"></span>
-      <button class="btn" id="editBtn" onclick="toggleEdit()" style="display:none">✎ Update figures</button>
       <button class="btn" id="pdfBtn" onclick="savePDF()">⬇ Save as PDF</button>
     </div>
   </div>
@@ -121,22 +120,6 @@
     <div class="panel"><div class="ph">Revenue &amp; Profit <span style="color:var(--muted)">FROM JOB TRACKER</span></div>
       <div class="startgrid" id="finGrid"></div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px">Revenue and per job costs come from your Job Tracker. Profit = revenue - expenses.</div>
-    </div>
-  </div>
-
-  <div class="panel" id="editPanel" style="display:none;margin-bottom:12px">
-    <div class="ph">Update Current Figures <span style="color:var(--muted)">type today's numbers, saved on this device</span></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Facebook followers<input type="number" id="e_fb" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Instagram followers<input type="number" id="e_ig" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Google reviews<input type="number" id="e_rev" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Website visits<input type="number" id="e_wv" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-      <label style="display:flex;flex-direction:column;font-size:11px;color:var(--muted);gap:3px">Posts &amp; reels published<input type="number" id="e_cp" style="width:100%;background:#f4f7fc;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:14px"></label>
-    </div>
-    <div style="margin-top:11px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <button class="btn" onclick="saveFigures()" style="background:#2E6BE6;color:#fff;border-color:#2E6BE6">Save figures</button>
-      <button class="btn" onclick="toggleEdit()">Cancel</button>
-      <span style="font-size:11px;color:var(--muted)">Jobs update automatically from the Job Tracker.</span>
     </div>
   </div>
 
@@ -377,8 +360,8 @@ function applyLive(){ /* deployed (agency) figures are authoritative; recompute 
  MONTHS.forEach(function(m){if(m&&m.revenue!=null){m.profit=(m.revenue||0)-(m.expense||0);}});
 }
 function stampUpdated(){var el=document.getElementById('updated');if(!el)return;el.textContent='';}
-function toggleEdit(){const p=document.getElementById('editPanel'),show=p.style.display==='none';if(show){const m=MONTHS[1];document.getElementById('e_fb').value=m.fbNow;document.getElementById('e_ig').value=m.igNow;document.getElementById('e_rev').value=m.reviews;document.getElementById('e_wv').value=m.webVisits;document.getElementById('e_cp').value=m.contentPub;}p.style.display=show?'block':'none';}
-function saveFigures(){const L=getLive(),gv=id=>{const v=document.getElementById(id).value.trim();return v===''?null:Number(v);};const fb=gv('e_fb'),ig=gv('e_ig'),rev=gv('e_rev'),wv=gv('e_wv'),cp=gv('e_cp');if(fb!=null)L.fb=fb;if(ig!=null)L.ig=ig;if(rev!=null)L.rev=rev;if(wv!=null)L.wv=wv;if(cp!=null)L.cp=cp;L.updated=new Date().toISOString();localStorage.setItem(LIVE_KEY,JSON.stringify(L));mi=1;applyLive();renderMonth();stampUpdated();toggleEdit();}
+function toggleEdit(){}
+function saveFigures(){}
 
 
 document.getElementById('info').innerHTML=[['Business','Keystart Auto Locksmiths'],['Owner','Sole Operator · Mobile'],['Base','Glossop, Derbyshire'],
