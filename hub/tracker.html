@@ -63,6 +63,18 @@
   .job .jt img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:pointer}
   .job .del{background:none;border:0;color:var(--red);font-size:12px;font-weight:700;cursor:pointer;padding:0}
   .empty{text-align:center;color:var(--grey);font-size:13px;padding:26px}
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .substat{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--grey);margin:-6px 2px 16px;font-weight:600}
+  .substat b{color:var(--navy)}
+  .plate{display:inline-block;font-family:'Manrope','Segoe UI',sans-serif;font-weight:800;letter-spacing:.08em;background:#F5D400;color:#111;border:1px solid #d9bb00;border-radius:5px;padding:2px 8px;font-size:12.5px;text-transform:uppercase;box-shadow:inset 3px 0 0 #163a8a}
+  .chartgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .chartbox{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:12px 12px 8px}
+  .chartbox h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--grey);font-weight:700}
+  .chartbox .cwrap{position:relative;height:200px}
+  .chartbox canvas{max-height:200px}
+  .convline{font-size:12.5px;color:#475569;margin-top:6px;text-align:center}.convline b{color:var(--navy)}
+  .preason{background:#FDE7E9;color:#B4232A}.pback{background:#FFF4E5;color:#9a6400}
+  @media(max-width:620px){.chartgrid{grid-template-columns:1fr}}
   .hint{font-size:11.5px;color:var(--grey);margin-top:10px;line-height:1.5}
   .lightbox{position:fixed;inset:0;background:rgba(8,16,32,.86);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
   .lightbox img{max-width:96%;max-height:92%;border-radius:10px}
@@ -99,26 +111,23 @@
     </div>
   </header>
 
-  <div class="stats">
-    <div class="stat"><div class="l">Jobs Logged</div><div class="v" id="sJobs">0</div></div>
-    <div class="stat"><div class="l">Today</div><div class="v" id="sToday">0</div></div>
-    <div class="stat"><div class="l">Tracked Value</div><div class="v" id="sValue">£0</div></div>
-  </div>
-
   <!-- ADD JOB -->
   <div class="card">
     <h2>ADD A JOB</h2>
-    <p class="note">Fill this in after each job. Date &amp; time fill in automatically.</p>
+    <p class="note">Fill this in after each job.</p>
     <div class="form">
       <div><label>Date</label><input type="date" id="fDate"></div>
       <div><label>Time</label><input type="time" id="fTime"></div>
       <div><label>Customer</label><input id="fName" placeholder="e.g. J. Harrison"></div>
       <div><label>Phone</label><input id="fPhone" placeholder="07…"></div>
       <div><label>Vehicle</label><input id="fVehicle" placeholder="e.g. Ford Transit"></div>
+      <div><label>Number Plate</label><input id="fReg" placeholder="e.g. AB12 CDE" style="text-transform:uppercase"></div>
       <div><label>Town</label><input id="fTown" list="towns" placeholder="e.g. Glossop">
         <datalist id="towns"><option>Glossop</option><option>Hadfield</option><option>Hyde</option><option>Stalybridge</option><option>Mottram</option><option>Broadbottom</option><option>New Mills</option><option>Buxton</option><option>Chapel-en-le-Frith</option><option>Chesterfield</option></datalist></div>
+      <div><label>Occupation</label><input id="fOcc" list="occs" placeholder="e.g. Delivery driver">
+        <datalist id="occs"><option>Delivery Driver</option><option>Taxi / Private Hire</option><option>Tradesperson</option><option>Nurse / NHS</option><option>Carer</option><option>Teacher</option><option>Office / Admin</option><option>Engineer</option><option>Self-Employed</option><option>Retired</option><option>Student</option><option>Sales / Rep</option><option>Driving Instructor</option><option>Other</option></datalist></div>
       <div><label>Service</label><select id="fService">
-        <option>Car Lockout</option><option>Spare Key</option><option>Lost All keys</option><option>Key Cutting</option>
+        <option>Car Lockout</option><option>Spare Key</option><option>Lost All Keys</option><option>Key Cutting</option>
         <option>Key Programming</option><option>Remote Repair</option><option>Van Locks</option><option>Ignition Repair</option><option>Other</option></select></div>
       <div><label>Price (£)</label><input id="fPrice" type="number" inputmode="decimal" placeholder="120"></div>
       <div><label>Expense (£)</label><input id="fExpense" type="number" inputmode="decimal" placeholder="0"></div>
@@ -130,7 +139,7 @@
       <div class="full">
         <label>Photos</label>
         <div class="photos-drop" id="drop">📷 Tap to add media</div>
-        <input type="file" id="fFiles" accept="image/*" capture="environment" multiple style="display:none">
+        <input type="file" id="fFiles" accept="image/*" multiple style="display:none">
         <div class="thumbs" id="thumbs"></div>
       </div>
       <div class="full" style="display:flex;align-items:center;gap:9px"><input type="checkbox" id="fPost" style="width:auto" checked><label for="fPost" style="margin:0">Customer is happy for photos to be used on social media</label></div>
@@ -138,17 +147,34 @@
     <div class="row-actions">
       <button class="btn" onclick="saveJob()">Save</button>
       <button class="btn sec" onclick="resetForm()">Clear</button>
-      <button class="btn ghost" onclick="exportBackup()">Backup</button>
       <span id="syncStatus" style="font-size:12px;color:var(--grey);align-self:center"></span>
     </div>
     <p class="hint">Each job is saved - you’ll see “✓ Saved to your job sheet” once it’s done.</p>
   </div>
 
 
-  <!-- JOBS LIST -->
-  <h2 style="font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--grey);margin:8px 4px 12px">Recorded jobs</h2>
-  <div class="jobs" id="list"></div>
-
+  <!-- RECORD A CALL -->
+  <div class="card" style="margin-top:22px">
+    <h2>RECORD A CALL</h2>
+    <p class="note">A quick log of calls.</p>
+    <div class="form">
+      <div><label>Enquiry Detail</label><select id="eService">
+        <option>Car Lockout</option><option>Spare Key</option><option>Lost All Keys</option><option>Key Cutting</option>
+        <option>Key Programming</option><option>Remote Repair</option><option>Van Locks</option><option>Ignition Repair</option><option>Not sure</option><option>Other</option></select></div>
+      <div><label>Reason</label><select id="eReason">
+        <option>Too Far / Out Of Area</option><option>Didn't Trust Us / Unsure</option><option>No Answer / Didn't Respond</option>
+        <option>Found Someone Else</option><option>Price Too High</option><option>Wrong Service (We Don't Do It)</option>
+        <option>Call Back Later</option><option>Time-Waster / Not Serious</option><option>Other</option></select></div>
+      <div><label>Town</label><input id="eTown" list="towns" placeholder="e.g. Buxton"></div>
+      <div><label>Quoted (£)</label><input id="ePrice" type="number" inputmode="decimal" placeholder="e.g. 90"></div>
+      <div class="full"><label>Additional Details</label><textarea id="eDetails" placeholder="Anything useful - where they were, what they said"></textarea></div>
+    </div>
+    <div class="row-actions">
+      <button class="btn" onclick="saveEnq()">Save</button>
+      <button class="btn sec" onclick="resetEnq()">Clear</button>
+      <span id="enqStatus" style="font-size:12px;color:var(--grey);align-self:center"></span>
+    </div>
+  </div>
   <footer style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;margin-top:18px;padding:24px 12px;border-top:1px solid #e6ebf2;color:#64748B;font-size:12px;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif">
     <img src="noonop-logo.png" alt="Noonop Studios" style="height:56px;width:auto;display:block;margin-bottom:4px">
     <div style="font-style:italic">Bespoke digital experiences that elevate your brand</div>
@@ -161,8 +187,13 @@
 
 <script>
 const KEY='keystart_jobs_v1';
+const EKEY='keystart_enquiries_v1';
 let jobs=JSON.parse(localStorage.getItem(KEY)||'[]');
+let enquiries=JSON.parse(localStorage.getItem(EKEY)||'[]');
 let pending=[]; // images for the job being added (data URLs)
+function gbp(n){return '£'+(Math.round(parseFloat(n)||0)).toLocaleString('en-GB');}
+function jobPrice(j){return parseFloat(j.price)||0;}
+function jobReceived(j){ if(j.received!==undefined&&j.received!==null&&String(j.received).trim()!=='') return parseFloat(j.received)||0; if((j.paid||'')==='Paid') return jobPrice(j); return 0; }
 
 /* ===== SAVE DIRECT TO THE SHARED "Job & Customer Log" SHEET =====
    Each job is POSTed to a Google Apps Script web app bound to the Sheet,
@@ -172,9 +203,10 @@ let pending=[]; // images for the job being added (data URLs)
 const SHEET_API = 'https://script.google.com/macros/s/AKfycbwZrTx-PYIHD38irX7XobNdBDVlObD_-H06W6rMwIwe6z-d2M3YTvK-7CvI5gQqAuBJWQ/exec';
 function setSync(t){const el=document.getElementById('syncStatus');if(el)el.textContent=t;}
 function jobParams(job){
-  const notesFull=[job.notes, job.vehicle?('Vehicle: '+job.vehicle):''].filter(Boolean).join(' · ');
-  return new URLSearchParams({uid:job.uid||'',date:job.date||'',name:job.name||'',phone:job.phone||'',town:job.town||'',
-    price:job.price||'',expense:job.expense||'',service:job.service||'',paid:job.paid||'',source:job.source||'',notes:notesFull,time:job.time||'',
+  const notesFull=[job.notes, job.vehicle?('Vehicle: '+job.vehicle):'', job.reg?('Reg: '+job.reg):''].filter(Boolean).join(' · ');
+  return new URLSearchParams({type:'job',uid:job.uid||'',date:job.date||'',name:job.name||'',phone:job.phone||'',town:job.town||'',
+    vehicle:job.vehicle||'',reg:job.reg||'',
+    price:job.price||'',expense:job.expense||'',received:jobReceived(job),service:job.service||'',paid:job.paid||'',source:job.source||'',notes:notesFull,time:job.time||'',
     okPost:(job.okPost?'Yes':'No'), photos:JSON.stringify(job.photos||[])});
 }
 /* A POST to an Apps Script /exec URL is answered with a 302 redirect whose
@@ -208,7 +240,7 @@ function nowParts(){const d=new Date();const pad=n=>String(n).padStart(2,'0');
 function resetForm(){
   const n=nowParts();
   fDate.value=n.date; fTime.value=n.time;
-  ['fName','fPhone','fVehicle','fTown','fPrice','fExpense','fNotes'].forEach(id=>document.getElementById(id).value='');
+  ['fName','fPhone','fVehicle','fReg','fTown','fOcc','fPrice','fExpense','fNotes'].forEach(id=>document.getElementById(id).value='');
   fService.selectedIndex=0; fPaid.selectedIndex=0; fSource.selectedIndex=0; fPost.checked=true;
   pending=[]; renderThumbs();
 }
@@ -241,7 +273,7 @@ function saveJob(){
   if(!fDate.value){alert('Please set a date.');return;}
   const job={uid:'KS'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
     id:nextId(),date:fDate.value,time:fTime.value,name:fName.value.trim(),phone:fPhone.value.trim(),
-    vehicle:fVehicle.value.trim(),town:fTown.value.trim(),service:fService.value,price:fPrice.value,expense:fExpense.value,
+    vehicle:fVehicle.value.trim(),reg:fReg.value.trim().toUpperCase(),town:fTown.value.trim(),occupation:fOcc.value.trim(),service:fService.value,price:fPrice.value,expense:fExpense.value,
     paid:fPaid.value,source:fSource.value,notes:fNotes.value.trim(),okPost:fPost.checked,
     photos:pending.slice(),photoCount:pending.length};
   jobs.unshift(job); persist(); render(); syncToSheet(job); resetForm();
@@ -261,12 +293,12 @@ function persist(){
     }
     jobs.forEach(j=>{ if(j.photos) j.photos=[]; }); // last resort: keep records, drop photos
     try{ localStorage.setItem(KEY,JSON.stringify(jobs)); }
-    catch(_){ alert('Storage is full. Please tap Backup to save a copy, then delete a few old jobs.'); }
+    catch(_){ alert('Storage is full - please clear some space on your device.'); }
   }
 }
 function exportBackup(){
   try{
-    const blob=new Blob([JSON.stringify(jobs,null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify({jobs:jobs,enquiries:enquiries,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
     a.download='keystart-jobs-backup-'+todayStr()+'.json';
@@ -279,33 +311,83 @@ function delJob(id){if(confirm('Delete this job?')){jobs=jobs.filter(j=>j.id!==i
 function show(src){lbImg.src=src;lightbox.style.display='flex';}
 
 function todayStr(){const d=new Date(),p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
-function render(){
-  document.getElementById('sJobs').textContent=jobs.length;
-  const today=todayStr();
-  document.getElementById('sToday').textContent=jobs.filter(j=>(j.date||'').slice(0,10)===today).length;
-  const val=jobs.reduce((s,j)=>s+(parseFloat(j.price)||0),0);
-  document.getElementById('sValue').textContent='£'+val.toLocaleString();
-  const L=document.getElementById('list');
-  if(!jobs.length){L.innerHTML='<div class="empty">No jobs yet - add your first one above.</div>';return;}
-  L.innerHTML=jobs.map(j=>{
-    const when=fmtDate(j.date)+(j.time?' · '+j.time:'');
-    const photos=(j.photos||[]).map(p=>`<img src="${p}" onclick="show('${'_'}');" data-s="${p}">`).join('');
-    const photoNote=(!photos&&j.photoCount)?`<div class="jt" style="color:var(--grey);font-size:12px;align-items:center">📷 ${j.photoCount} photo${j.photoCount>1?'s':''} saved to Drive</div>`:'';
-    return `<div class="job"><div class="top"><div>
-      <div class="id">${j.id}</div><h3>${j.service}${j.name?' - '+esc(j.name):''}</h3>
-      <div class="meta">${[j.vehicle,j.town].filter(Boolean).map(esc).join(' · ')||'&nbsp;'}${j.notes?'<br>'+esc(j.notes):''}</div>
-      <div style="margin-top:8px">${j.price?`<span class="pill pgreen">£${esc(j.price)}</span>`:''}${j.expense?`<span class="pill" style="background:#FDE7E9;color:#B4232A">Cost £${esc(j.expense)}</span>`:''}<span class="pill pamber">${esc(j.paid||'')}</span><span class="pill pblue">${esc(j.source||'')}</span>${j.okPost?'<span class="pill pgreen">OK to post</span>':'<span class="pill pamber">no posting</span>'}</div>
-      </div><div style="text-align:right"><div class="when">${when}</div><button class="del" onclick="delJob('${j.id}')">Delete</button></div></div>
-      ${photos?`<div class="jt">${photos}</div>`:photoNote}</div>`;
-  }).join('');
-  // bind image clicks (avoids quote issues)
-  document.querySelectorAll('.job .jt img').forEach(im=>im.onclick=()=>show(im.dataset.s));
-}
+function render(){ /* on-page job & enquiry lists removed - records go straight to the sheet / Supabase, not stored on the page */ }
 function fmtDate(d){if(!d)return'';const[y,m,da]=d.split('-');const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return da+' '+M[(+m)-1]+' '+y.slice(2);}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
+/* ===== ENQUIRIES: CALLED BUT NO JOB ===== */
+function persistE(){ try{ localStorage.setItem(EKEY,JSON.stringify(enquiries)); }catch(e){} }
+function nextEId(){const n=enquiries.length?Math.max(...enquiries.map(e=>parseInt((e.id||'EN-0').split('-')[1])||0)):0; return 'EN-'+String(n+1).padStart(4,'0');}
+function resetEnq(){ eTown.value=''; ePrice.value=''; eDetails.value=''; eService.selectedIndex=0; eReason.selectedIndex=0; }
+function setEnqStatus(t){const el=document.getElementById('enqStatus'); if(el)el.textContent=t;}
+/* A call is written into the SAME "Job & Customer Log" sheet as jobs, so both are
+   tracked in one place. It is clearly flagged as a call (id EN-####, Paid = "No job",
+   type = enquiry) and carries NO price/received, so it never affects revenue totals.
+   The reason, any additional details and the quoted amount are packed into Notes so
+   they show even if the sheet has no dedicated columns for them. */
+function enqParams(e){
+  const detail=['CALL - NO JOB', e.reason?('Reason: '+e.reason):'', e.details?('Details: '+e.details):'', e.price?('Quoted £'+e.price):''].filter(Boolean).join(' · ');
+  return new URLSearchParams({type:'enquiry',uid:e.uid||'',id:e.id||'',date:e.date||'',time:e.time||'',
+    name:'',phone:'',town:e.town||'',vehicle:'',reg:'',
+    price:'',expense:'',received:'',service:e.service||'',paid:'No job',source:'',notes:detail,
+    reason:e.reason||'',details:e.details||'',quoted:e.price||'',okPost:'No',photos:'[]'});
+}
+/* Calls now post to the same sheet endpoint as jobs. Any call that doesn't confirm is
+   kept on the device and re-sent automatically next time the tracker is opened. */
+const ENQUIRY_SYNC=true;
+function syncEnq(e){ if(!ENQUIRY_SYNC){ setEnqStatus('✓ Saved on this device'); return; } setEnqStatus('Saving…'); fetch(SHEET_API,{method:'POST',mode:'no-cors',body:enqParams(e)}).then(()=>{e.synced=true;persistE();setEnqStatus('✓ Saved to your job sheet');}).catch(()=>{setEnqStatus('No internet - saved here, will send when back online');}); }
+let _resendingE=false;
+function resendUnsyncedE(){ if(!ENQUIRY_SYNC)return; if(_resendingE)return; const q=enquiries.filter(e=>!e.synced); if(!q.length)return; _resendingE=true; Promise.all(q.map(e=>fetch(SHEET_API,{method:'POST',mode:'no-cors',body:enqParams(e)}).then(()=>{e.synced=true;}).catch(()=>{}))).then(()=>{persistE();renderE();_resendingE=false;}).catch(()=>{_resendingE=false;}); }
+function saveEnq(){ const n=nowParts(); const e={uid:'KE'+Date.now().toString(36)+Math.random().toString(36).slice(2,7), id:nextEId(), date:n.date,time:n.time,town:eTown.value.trim(),service:eService.value,reason:eReason.value,price:ePrice.value.trim(),details:eDetails.value.trim()}; enquiries.unshift(e); persistE(); render(); syncEnq(e); resetEnq(); }
+function delEnq(id){ if(confirm('Delete this enquiry?')){ enquiries=enquiries.filter(e=>e.id!==id); persistE(); render(); } }
+function renderE(){
+  const L=document.getElementById('elist'); if(!L)return;
+  if(!enquiries.length){L.innerHTML='<div class="empty">No enquiries logged yet.</div>';return;}
+  L.innerHTML=enquiries.map(e=>{
+    const when=fmtDate(e.date)+(e.time?' · '+e.time:'');
+    const rcls=/(call back|later)/i.test(e.reason||'')?'pback':'preason';
+    return `<div class="job"><div class="top"><div>
+      <div class="id">${e.id}</div><h3>${esc(e.service||'Enquiry')}${e.name?' - '+esc(e.name):''}</h3>
+      <div class="meta">${e.reg?`<span class="plate">${esc(e.reg)}</span> `:''}${[e.vehicle,e.town,e.phone].filter(Boolean).map(esc).join(' · ')||''}${e.notes?'<br>'+esc(e.notes):''}</div>
+      <div style="margin-top:8px"><span class="pill ${rcls}">${esc(e.reason||'')}</span>${e.price?`<span class="pill pblue">Quoted ${gbp(e.price)}</span>`:''}</div>
+      </div><div style="text-align:right"><div class="when">${when}</div><button class="del" onclick="delEnq('${e.id}')">Delete</button></div></div></div>`;
+  }).join('');
+}
 
-resetForm(); render(); resendUnsynced();
+/* ===== CHARTS ===== */
+let _charts={};
+function mkChart(id,cfg){ const el=document.getElementById(id); if(!el||typeof Chart==='undefined')return; if(_charts[id])_charts[id].destroy(); _charts[id]=new Chart(el,cfg); }
+function tally(arr,keyFn){ const m={}; arr.forEach(x=>{const k=keyFn(x)||'-'; m[k]=(m[k]||0)+1;}); return m; }
+const CHART_COLORS=['#2E6BE6','#22B8A6','#F0A431','#16A34A','#8B5CF6','#E5484D','#0EA5E9','#EC4899','#64748B','#14B8A6'];
+function renderCharts(){
+  if(typeof Chart==='undefined')return;
+  const nf={plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false};
+  const days=[]; const base=new Date(); base.setHours(0,0,0,0);
+  for(let i=13;i>=0;i--){const d=new Date(base); d.setDate(base.getDate()-i); const p=n=>String(n).padStart(2,'0'); days.push(d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()));}
+  const revByDay=days.map(ds=>jobs.filter(j=>(j.date||'').slice(0,10)===ds).reduce((s,j)=>s+jobReceived(j),0));
+  const expByDay=days.map(ds=>jobs.filter(j=>(j.date||'').slice(0,10)===ds).reduce((s,j)=>s+(parseFloat(j.expense)||0),0));
+  const profByDay=revByDay.map((r,i)=>r-expByDay[i]);
+  const dlabels=days.map(ds=>{const[y,m,da]=ds.split('-');return da+'/'+m;});
+  mkChart('chRev',{type:'bar',data:{labels:dlabels,datasets:[
+    {label:'Received',data:revByDay,backgroundColor:'#2E6BE6',borderRadius:4,order:2},
+    {type:'line',label:'Profit',data:profByDay,borderColor:'#16A34A',backgroundColor:'#16A34A',tension:.3,pointRadius:3,borderWidth:2,order:1}
+  ]},options:{...nf,plugins:{legend:{display:true,position:'top',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'£'+v}}}}});
+  const svc=tally(jobs,j=>j.service); const svcK=Object.keys(svc);
+  mkChart('chSvc',{type:'doughnut',data:{labels:svcK,datasets:[{data:svcK.map(k=>svc[k]),backgroundColor:CHART_COLORS}]},options:{...nf,plugins:{legend:{display:true,position:'right',labels:{boxWidth:12,font:{size:11}}}}}});
+  const src=tally(jobs,j=>j.source); const srcK=Object.keys(src);
+  mkChart('chSrc',{type:'doughnut',data:{labels:srcK,datasets:[{data:srcK.map(k=>src[k]),backgroundColor:CHART_COLORS}]},options:{...nf,plugins:{legend:{display:true,position:'right',labels:{boxWidth:12,font:{size:11}}}}}});
+  const won=jobs.length, lost=enquiries.length;
+  mkChart('chConv',{type:'bar',data:{labels:['Won (jobs)','Lost (no job)'],datasets:[{data:[won,lost],backgroundColor:['#16A34A','#E5484D'],borderRadius:5}]},options:{...nf,scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+  const tot=won+lost; const cn=document.getElementById('convNote'); if(cn)cn.innerHTML=tot?`<b>${won}</b> won · <b>${lost}</b> lost · conversion <b>${Math.round(won/tot*100)}%</b>`:'No calls logged yet';
+  const rs=tally(enquiries,e=>e.reason); const rsK=Object.keys(rs);
+  mkChart('chReason',{type:'bar',data:{labels:rsK,datasets:[{data:rsK.map(k=>rs[k]),backgroundColor:'#E5484D',borderRadius:4}]},options:{...nf,indexAxis:'y',scales:{x:{beginAtZero:true,ticks:{precision:0}}}}});
+}
+
+/* Uppercase plates */
+document.getElementById('fReg').addEventListener('input',function(){ const s=this.selectionStart; this.value=this.value.toUpperCase(); this.setSelectionRange(s,s); });
+
+
+resetForm(); resetEnq(); render(); resendUnsynced(); resendUnsyncedE();
 /* Keep the figures correct each day: refresh exactly at midnight (local time),
    and also whenever the tracker is reopened or refocused. */
 let _trackDay=todayStr();
