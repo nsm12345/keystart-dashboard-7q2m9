@@ -70,6 +70,10 @@
   @media print{body{background:#fff;color:#111}.panel{break-inside:avoid}.btn,.mnav{display:none}}
 .ncursive{font-family:"Great Vibes",cursive;line-height:.85}.ncsub{font-family:Georgia,"Times New Roman",serif;text-transform:uppercase;letter-spacing:.32em}.nlock{display:inline-flex;flex-direction:column}
 .startgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(188px,1fr));gap:10px}
+.statgrid{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.statgrid>.sg{flex:1 1 calc(25% - 8px);min-width:210px}
+@media(max-width:1100px){.statgrid>.sg{flex:1 1 calc(50% - 5px)}}
+@media(max-width:640px){.statgrid>.sg{flex:1 1 100%}}
 .sg{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
 .sgh{display:flex;align-items:center;gap:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#5b6675;margin-bottom:8px}
 .sdot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto}
@@ -120,14 +124,6 @@
     <div class="panel"><div class="ph">Revenue &amp; Profit <span style="color:var(--muted)">FROM JOB TRACKER</span></div>
       <div class="startgrid" id="finGrid"></div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px">Revenue and per job costs come from your Job Tracker. Profit = revenue - expenses.</div>
-    </div>
-  </div>
-
-  <div class="row" id="rowCalls" style="grid-template-columns:1fr;display:none">
-    <div class="panel"><div class="ph">Calls &amp; Enquiries <span style="color:var(--muted)">FROM JOB TRACKER</span></div>
-      <div class="startgrid" id="callsGrid"></div>
-      <div id="callsWhy" style="margin-top:12px"></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:8px">Every enquiry call is logged, whether it turned into a job or not. Conversion = jobs booked divided by enquiries.</div>
     </div>
   </div>
 
@@ -245,7 +241,7 @@ const MONTHS=[
   weeks:['Start','W1','W2','W3','W4'],
   fb:[191,191,191,191,191],ig:[10,10,10,10,10],
   engFb:[6,6,6,6,6],engIg:[0,0,0,0,0],
-  fbNow:196,igNow:13,reviews:19,jobs:11,revenue:2045,contentPub:0,contentPlan:8,webVisits:86,
+  fbNow:196,igNow:13,reviews:19,jobs:11,revenue:2045,expense:160,contentPub:3,contentPlan:8,webVisits:86,
   goals:[['Facebook Followers',196,220,C.blue],['Instagram Followers',13,50,C.purple],['Google Reviews',19,25,C.amber],['Website Visits',86,150,C.teal],['Jobs Logged',11,10,C.green],['Content Published',3,8,C.blue]],
   stats:{webVisits:86,
     gbp:{views:221,interactions:104,rating:5.0},
@@ -253,7 +249,7 @@ const MONTHS=[
     fb:{reach:5500,views:10364,visits:329,interactions:66,newFollows:11,posts:3},
     ig:{posts:3,reach:null},gsc:{clicks:41,impressions:3690,ctr:1.1,position:23.5}},
   enh:[['s-d','✓','Flyer Design'],['s-d','✓','Business Card Design']],
-  extras:[['s-d','✓','Marketing Hub (Client Portal)'],['s-d','✓','Live Job Tracker'],['s-d','✓','Shared Google Drive'],['s-d','✓','Auto-Generated Message Response for Messenger, Instagram &amp; WhatsApp']],
+  extras:[['s-d','✓','Marketing Hub (Client Portal)'],['s-d','✓','Live Job Tracker'],['s-d','✓','Facebook Cover Photo Design'],['s-d','✓','Auto-Generated Message Response for Messenger, Instagram &amp; WhatsApp']],
   cal:[['Week 1','post','Branded social post','FB&IG'],['Week 1','reel','Short-form reel','FB&IG'],['Week 2','post','Branded social post','FB&IG'],
    ['Week 2','post','Branded social post','FB&IG'],['Week 3','post','Branded social post','FB&IG'],['Week 3','reel','Short-form reel','FB&IG'],
    ['Week 4','post','Branded social post','FB&IG'],['Week 4','post','Branded social post','FB&IG']]},
@@ -323,7 +319,7 @@ const EXTRAS=[
 const EXTRAFREE=[
  ['s-d','\u2713','Marketing Hub (Client Portal)'],
  ['s-d','\u2713','Live Job Tracker'],
- ['s-d','\u2713','Shared Google Drive'],
+ ['s-d','\u2713','Facebook Cover Photo Design'],
  ['s-d','\u2713','Auto-Generated Message Response for Messenger, Instagram &amp; WhatsApp'],
 ];
 
@@ -339,7 +335,7 @@ function statsGroupsHTML(S,isBaseline,M){
    ['Instagram','#bc8cff',[['Followers',v(M?M.igNow:null)],['Posts',v(S.ig.posts)],['Reach',v(S.ig.reach)]]],
    ['Google Business','#d29922',[['Search Views',v(S.gbp.views)],['Reviews',v(M?M.reviews:null)],['Profile Interactions',v(S.gbp.interactions)],['Rating',S.gbp.rating==null?'-':S.gbp.rating.toFixed(1)+'★']]],['Google Search','#4285F4',[['Clicks',v(S.gsc?S.gsc.clicks:null)],['Impressions',v(S.gsc?S.gsc.impressions:null)],['CTR',(S.gsc&&S.gsc.ctr!=null)?S.gsc.ctr+'%':'-'],['Avg. Position',(S.gsc&&S.gsc.position!=null)?S.gsc.position:'-']]]
  ];
- return '<div class="startgrid">'+groups.map(g=>
+ return '<div class="statgrid">'+groups.map(g=>
    `<div class="sg"><div class="sgh"><span class="sdot" style="background:${g[1]}"></span>${g[0]}</div>`+
    g[2].map(r=>`<div class="sgr"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')+
    '</div>').join('')+'</div>';
@@ -367,28 +363,6 @@ function renderMonth(){
    var _exp=m.expense||0, _pft=(m.profit!=null)?m.profit:((m.revenue||0)-_exp);
    document.getElementById('finGrid').innerHTML=[['Revenue Tracked',_fm(m.revenue),'#0E9F6E'],['Expenses',_fm(_exp),'#C77700'],['Profit',_fm(_pft),'#2E6BE6']].map(function(x){return '<div class="sg"><div class="sgh">'+x[0]+'</div><div style="font-size:22px;font-weight:800;color:'+x[2]+'">'+x[1]+'</div></div>';}).join('');
  } else { _fr.style.display='none'; } }
- var _cr=document.getElementById('rowCalls');
- if(_cr){ var _c=m.calls;
-   if(!isM0&&m.has&&_c&&_c.enquiries!=null){ _cr.style.display='';
-     var _rate=_c.enquiries?Math.round(_c.booked/_c.enquiries*100):0;
-     document.getElementById('callsGrid').innerHTML=[
-       ['Enquiries Logged',_c.enquiries,'#2E6BE6'],
-       ['Jobs Booked',_c.booked,'#0E9F6E'],
-       ['Not Converted',_c.notConverted,'#C77700'],
-       ['Conversion Rate',_rate+'%','#0E1F3A']
-     ].map(function(x){return '<div class="sg"><div class="sgh">'+x[0]+'</div><div style="font-size:22px;font-weight:800;color:'+x[2]+'">'+x[1]+'</div></div>';}).join('');
-     var _wy=[['Too Far / Out Of Area',_c.outOfArea],['Call Back Later',_c.callBack],['Other',_c.other]].filter(function(r){return r[1]!=null;});
-     var _tot=_wy.reduce(function(a,r){return a+r[1];},0)||1;
-     var _cols=['#C77700','#2E6BE6','#99A1B0'];
-     document.getElementById('callsWhy').innerHTML=
-       '<div class="ph" style="margin-bottom:6px">Why Calls Did Not Convert</div>'+
-       '<div style="display:flex;height:14px;border-radius:7px;overflow:hidden;border:1px solid var(--border)">'+
-       _wy.map(function(r,i){return '<div title="'+r[0]+': '+r[1]+'" style="width:'+(r[1]/_tot*100)+'%;background:'+_cols[i]+'"></div>';}).join('')+
-       '</div><div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:12px;color:#334155">'+
-       _wy.map(function(r,i){return '<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:9px;height:9px;border-radius:2px;background:'+_cols[i]+';display:inline-block"></i>'+r[0]+' <b>'+r[1]+'</b></span>';}).join('')+
-       (_c.quotedLost!=null?'<span style="color:var(--muted)">Value Quoted But Not Won <b style="color:#C0554E">£'+Number(_c.quotedLost).toLocaleString('en-GB')+'</b></span>':'')+
-       '</div>';
-   } else { _cr.style.display='none'; } }
  const bd=isM0?m.start:m.stats, rowStats=document.getElementById('rowStats');
  if(bd){
    document.getElementById('statsHead').textContent=isM0?'Baseline Statistics':'Statistics';
@@ -398,7 +372,7 @@ function renderMonth(){
  document.getElementById('rowSC').style.display='none';
  document.getElementById('rowIncluded').style.display=isM0?'none':'';
  document.getElementById('rowInfo').style.display=isM0?'':'none';
- if(m.enh&&m.enh.length){document.getElementById('enhWrap').style.display='';document.getElementById('enh').innerHTML=m.enh.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('enhWrap').style.display='none';}
+ if(m.enh&&m.enh.length){document.getElementById('enhWrap').style.display='';document.getElementById('enh').innerHTML=m.enh.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('enh').innerHTML='';document.getElementById('enhWrap').style.display='none';}
  if(m.extras&&m.extras.length){document.getElementById('extrasWrap').style.display='';document.getElementById('extras2').innerHTML=m.extras.map(s=>`<li><span class="ck ${s[0]}">${s[1]}</span><span>${s[2]}</span></li>`).join('');}else{document.getElementById('extrasWrap').style.display='none';}
  var _sc=(m.scope&&m.scope.length)?m.scope:SCOPE;var _scEl=document.getElementById('scope');if(_scEl)_scEl.innerHTML=_sc.map(function(s){return '<li><span class="ck '+s[0]+'">'+s[1]+'</span><span>'+s[2]+'</span></li>';}).join('');var _scL=document.getElementById('scopeLabel');if(_scL)_scL.textContent=m.scopeLabel||'LAUNCH SUITE';
  if(isM0){
