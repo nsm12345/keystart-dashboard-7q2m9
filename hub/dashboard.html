@@ -123,6 +123,14 @@
     </div>
   </div>
 
+  <div class="row" id="rowCalls" style="grid-template-columns:1fr;display:none">
+    <div class="panel"><div class="ph">Calls &amp; Enquiries <span style="color:var(--muted)">FROM JOB TRACKER</span></div>
+      <div class="startgrid" id="callsGrid"></div>
+      <div id="callsWhy" style="margin-top:12px"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">Every enquiry call is logged, whether it turned into a job or not. Conversion = jobs booked divided by enquiries.</div>
+    </div>
+  </div>
+
   <div class="row" id="rowStats">
     <div class="panel"><div class="ph" id="statsHead">Statistics</div><div id="statsBreak"></div></div>
   </div>
@@ -134,15 +142,15 @@
       </div>
       <div class="cgrid2">
         <div class="cbox" id="boxJobs"><div class="ct" id="chJobsTitle">Jobs By Source</div><div class="cw"><canvas id="chJobs"></canvas></div></div>
-        <div class="cbox" id="boxQrScans"><div class="ct">QR Scans By Printed Item</div><div class="cw"><canvas id="chQrScans"></canvas></div></div>
+        <div class="cbox" id="boxWebSrc"><div class="ct">Website Traffic By Source</div><div class="cw"><canvas id="chWebSrc"></canvas></div></div>
       </div>
       <div class="cgrid2">
         <div class="cbox" id="boxRev"><div class="ct" id="chRevTitle">Revenue By Source (£)</div><div class="cw"><canvas id="chRev"></canvas></div></div>
         <div class="cbox"><div class="ct">Services Delivered</div><div class="cw"><canvas id="chSvc"></canvas></div></div>
       </div>
       <div class="cgrid2">
-        <div class="cbox" id="boxWebSrc"><div class="ct">Website Traffic By Source</div><div class="cw"><canvas id="chWebSrc"></canvas></div></div>
-        <div class="cbox" id="boxQrClicks"><div class="ct">What Visitors Tapped After Scanning</div><div class="cw"><canvas id="chQrClicks"></canvas></div></div>
+        <div class="cbox" id="boxQrScans"><div class="ct">QR Scans By Printed Item</div><div class="cw"><canvas id="chQrScans"></canvas></div></div>
+        <div class="cbox" id="boxQrClicks"><div class="ct">QR Taps By Link</div><div class="cw"><canvas id="chQrClicks"></canvas></div></div>
       </div>
     </div>
   </div>
@@ -268,7 +276,7 @@ const MONTHS=[
    ['Foundations',['3-Month Marketing Plan (Aug – Nov) delivered','Month 1 report &amp; portfolio delivered','Package upgraded to the Elevate Suite']]
   ],extras:[
    ['s-d','✓','Business Card Design']
-  ],stats:{webVisits:103,gbp:{views:195,interactions:47,rating:5.0},wix:{visitors:88,newPct:99,duration:55,bounce:56,fromGoogle:46,fromFacebook:14,forms:2},fb:{reach:18100,views:31247,visits:225,interactions:62,newFollows:4,posts:12,linkClicks:216},ig:{posts:12,reach:1100},gsc:{clicks:43,impressions:3542,ctr:1.2,position:22.9}}},
+  ],calls:{enquiries:25,booked:17,notConverted:8,outOfArea:3,callBack:4,other:1,quotedLost:865},stats:{webVisits:103,gbp:{views:195,interactions:47,rating:5.0},wix:{visitors:88,newPct:99,duration:55,bounce:56,fromGoogle:46,fromFacebook:14,forms:2},fb:{reach:18100,views:31247,visits:225,interactions:62,newFollows:4,posts:12,linkClicks:216},ig:{posts:12,reach:1100},gsc:{clicks:43,impressions:3542,ctr:1.2,position:22.9}}},
  {name:'Month 3',range:'15 Aug - 15 Sep 2026',has:false},
 ];
 try{
@@ -306,6 +314,7 @@ function statsGroupsHTML(S,isBaseline,M){
  const v=x=>x==null?'-':Number(x).toLocaleString('en-GB'), dur=s=>s==null?'-':Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s', pc=x=>x==null?'-':v(x)+'%';
  const groups=[
     ['Jobs & Revenue','#0E9F6E',[['Jobs Logged',v(M?M.jobs:null)],['Revenue Tracked',(M&&M.revenue!=null)?('£'+Number(M.revenue).toLocaleString('en-GB')):'-'],['Avg Job Value',(M&&M.jobs)?('£'+Number(Math.round(M.revenue/M.jobs)).toLocaleString('en-GB')):'-'],['From Google',v(M&&M.jobsSrc?M.jobsSrc.google:null)],['From Facebook',v(M&&M.jobsSrc?M.jobsSrc.facebook:null)],['Repeat Customers',v(M&&M.jobsSrc?M.jobsSrc.repeat:null)],['Other',v(M&&M.jobsSrc?M.jobsSrc.other:null)]]],
+   ['Calls & Enquiries','#2E6BE6',[['Enquiries Logged',v(M&&M.calls?M.calls.enquiries:null)],['Jobs Booked',v(M&&M.calls?M.calls.booked:null)],['Conversion Rate',(M&&M.calls&&M.calls.enquiries)?Math.round(M.calls.booked/M.calls.enquiries*100)+'%':'-'],['Not Converted',v(M&&M.calls?M.calls.notConverted:null)],['Too Far / Out Of Area',v(M&&M.calls?M.calls.outOfArea:null)],['Call Back Later',v(M&&M.calls?M.calls.callBack:null)],['Other Reason',v(M&&M.calls?M.calls.other:null)],['Value Quoted But Not Won',(M&&M.calls&&M.calls.quotedLost!=null)?('£'+Number(M.calls.quotedLost).toLocaleString('en-GB')):'-']]],
    ['Website · Wix','#39c5cf',[['Sessions',v(S.webVisits)],['Unique Visitors',v(S.wix.visitors)],['New Visitors',pc(S.wix.newPct)],['Avg. Session',dur(S.wix.duration)],['Bounce Rate',pc(S.wix.bounce)],['Visits From Google',v(S.wix.fromGoogle)],['Contact Forms',v(S.wix.forms)],['Visits From Facebook',v(S.wix.fromFacebook)]]],
    ['Facebook','#58a6ff',[['Reach',v(S.fb.reach)],['Post Views',v(S.fb.views)],['Page Visits',v(S.fb.visits)],['Content Interactions',v(S.fb.interactions)],['New Follows',v(S.fb.newFollows)],['Posts Published',v(S.fb.posts)],['Followers',v(M?M.fbNow:null)],['Link Clicks To Site',v(S.fb.linkClicks)]]],
    ['Instagram','#bc8cff',[['Followers',v(M?M.igNow:null)],['Posts',v(S.ig.posts)],['Reach',v(S.ig.reach)]]],
@@ -338,6 +347,28 @@ function renderMonth(){
    var _exp=m.expense||0, _pft=(m.profit!=null)?m.profit:((m.revenue||0)-_exp);
    document.getElementById('finGrid').innerHTML=[['Revenue Tracked',_fm(m.revenue),'#0E9F6E'],['Expenses',_fm(_exp),'#C77700'],['Profit',_fm(_pft),'#2E6BE6']].map(function(x){return '<div class="sg"><div class="sgh">'+x[0]+'</div><div style="font-size:22px;font-weight:800;color:'+x[2]+'">'+x[1]+'</div></div>';}).join('');
  } else { _fr.style.display='none'; } }
+ var _cr=document.getElementById('rowCalls');
+ if(_cr){ var _c=m.calls;
+   if(!isM0&&m.has&&_c&&_c.enquiries!=null){ _cr.style.display='';
+     var _rate=_c.enquiries?Math.round(_c.booked/_c.enquiries*100):0;
+     document.getElementById('callsGrid').innerHTML=[
+       ['Enquiries Logged',_c.enquiries,'#2E6BE6'],
+       ['Jobs Booked',_c.booked,'#0E9F6E'],
+       ['Not Converted',_c.notConverted,'#C77700'],
+       ['Conversion Rate',_rate+'%','#0E1F3A']
+     ].map(function(x){return '<div class="sg"><div class="sgh">'+x[0]+'</div><div style="font-size:22px;font-weight:800;color:'+x[2]+'">'+x[1]+'</div></div>';}).join('');
+     var _wy=[['Too Far / Out Of Area',_c.outOfArea],['Call Back Later',_c.callBack],['Other',_c.other]].filter(function(r){return r[1]!=null;});
+     var _tot=_wy.reduce(function(a,r){return a+r[1];},0)||1;
+     var _cols=['#C77700','#2E6BE6','#99A1B0'];
+     document.getElementById('callsWhy').innerHTML=
+       '<div class="ph" style="margin-bottom:6px">Why Calls Did Not Convert</div>'+
+       '<div style="display:flex;height:14px;border-radius:7px;overflow:hidden;border:1px solid var(--border)">'+
+       _wy.map(function(r,i){return '<div title="'+r[0]+': '+r[1]+'" style="width:'+(r[1]/_tot*100)+'%;background:'+_cols[i]+'"></div>';}).join('')+
+       '</div><div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:12px;color:#334155">'+
+       _wy.map(function(r,i){return '<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:9px;height:9px;border-radius:2px;background:'+_cols[i]+';display:inline-block"></i>'+r[0]+' <b>'+r[1]+'</b></span>';}).join('')+
+       (_c.quotedLost!=null?'<span style="color:var(--muted)">Value Quoted But Not Won <b style="color:#C0554E">£'+Number(_c.quotedLost).toLocaleString('en-GB')+'</b></span>':'')+
+       '</div>';
+   } else { _cr.style.display='none'; } }
  const bd=isM0?m.start:m.stats, rowStats=document.getElementById('rowStats');
  if(bd){
    document.getElementById('statsHead').textContent=isM0?'Baseline Statistics':'Statistics';
