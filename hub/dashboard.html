@@ -276,8 +276,27 @@ const MONTHS=[
    ['Foundations',['3-Month Marketing Plan (Aug – Nov) delivered','Month 1 report &amp; portfolio delivered','Package upgraded to the Elevate Suite']]
   ],extras:[
    ['s-d','✓','Business Card Design']
-  ],calls:{enquiries:25,booked:17,notConverted:8,outOfArea:3,callBack:4,other:1,quotedLost:865},stats:{webVisits:103,gbp:{views:195,interactions:47,rating:5.0},wix:{visitors:88,newPct:99,duration:55,bounce:56,fromGoogle:46,fromFacebook:14,forms:2},fb:{reach:18100,views:31247,visits:225,interactions:62,newFollows:4,posts:12,linkClicks:216},ig:{posts:12,reach:1100},gsc:{clicks:43,impressions:3542,ctr:1.2,position:22.9}}},
- {name:'Month 3',range:'15 Aug - 15 Sep 2026',has:false},
+  ],calls:{enquiries:24,booked:17,notConverted:7,outOfArea:3,callBack:3,other:1,quotedLost:865},stats:{webVisits:103,gbp:{views:195,interactions:47,rating:5.0},wix:{visitors:88,newPct:99,duration:55,bounce:56,fromGoogle:46,fromFacebook:14,forms:2},fb:{reach:18100,views:31247,visits:225,interactions:62,newFollows:4,posts:12,linkClicks:216},ig:{posts:12,reach:1100},gsc:{clicks:43,impressions:3542,ctr:1.2,position:22.9}}},
+ {name:'Month 3',range:'15 Aug - 15 Sep 2026',has:true,
+  scopeLabel:'ELEVATE SUITE',
+  scope:[
+   ['s-d','✓','Full Website Improvements Within Wix Capabilities'],
+   ['s-d','✓','Enhanced On-Page &amp; Technical SEO Optimisation'],
+   ['s-d','✓','Detailed Monthly Analytics &amp; Growth Insights'],
+   ['s-d','✓','Setup &amp; Optimisation For 4 Social Media Platforms'],
+   ['s-d','✓','Content Scheduling &amp; Posting Management'],
+   ['s-d','✓','8 Branded Social Media Posts Per Month'],
+   ['s-d','✓','4 Short Video Reels Per Month'],
+   ['s-d','✓','Competitor &amp; Keyword Review'],
+  ],
+  extras:[
+   ['s-d','✓','Business Card Design']
+  ],
+  fbNow:null,igNow:null,reviews:null,jobs:null,revenue:null,expense:null,contentPub:null,contentPlan:12,webVisits:null,
+  jobsSrc:null,trafficSrc:null,calls:null,
+  goals:[['Facebook Followers',191,240,C.blue],['Instagram Followers',16,60,C.purple],['Google Reviews',22,30,C.amber],['Website Visits',0,150,C.teal],['Jobs Logged',0,10,C.green],['Content Published',0,12,C.blue]],
+  stats:{webVisits:null,gbp:{views:null,interactions:null,rating:null},wix:{visitors:null,newPct:null,duration:null,bounce:null,fromGoogle:null,fromFacebook:null,forms:null},fb:{reach:null,views:null,visits:null,interactions:null,newFollows:null,posts:null,linkClicks:null},ig:{posts:null,reach:null},gsc:{clicks:null,impressions:null,ctr:null,position:null}}},
+ {name:'Month 4',range:'15 Sep - 15 Oct 2026',has:false},
 ];
 try{
  if(MONTHS[0]&&MONTHS[0].start){MONTHS[0].start.fb.linkClicks=0;MONTHS[0].start.wix.fromFacebook=1;MONTHS[0].jobsSrc={google:0,facebook:0,repeat:0,other:0};}
@@ -328,16 +347,17 @@ function statsGroupsHTML(S,isBaseline,M){
 function renderMonth(){
  const m=MONTHS[mi];
  const isM0=mi===0;
- const jobsVal=m.has?m.jobs:'-';
+ const nz=function(x){return (x==null||x==='')?'-':x;};
+ const jobsVal=m.has?nz(m.jobs):'-';
  document.getElementById('curM').innerHTML=m.name+'<br><span style="font-size:9.5px;color:var(--muted);font-weight:500;letter-spacing:0">'+(m.range||'')+'</span>';
  document.getElementById('prev').disabled=mi===0;document.getElementById('next').disabled=mi===MONTHS.length-1;
  const wv=isM0?(m.start?m.start.webVisits:null):m.webVisits;
- const webCell=(wv!=null&&wv>0)?[wv,'Visits']:['Live',''];
+ const webCell=(wv!=null&&wv>0)?[wv,'Visits']:['-','Visits'];
  const g3={Website:150,Facebook:220,Instagram:50,Google:25,Jobs:10};
  const gd=(k,u)=>u;
  const STAT=m.has?[
-   ['s-green','Website',webCell[0],gd('Website',webCell[1]||'Visits')],['s-blue','Facebook',m.fbNow,gd('Facebook','Followers')],
-   ['s-purple','Instagram',m.igNow,gd('Instagram','Followers')],['s-amber','Google',m.reviews,gd('Google','Reviews')],
+   ['s-green','Website',webCell[0],gd('Website',webCell[1]||'Visits')],['s-blue','Facebook',nz(m.fbNow),gd('Facebook','Followers')],
+   ['s-purple','Instagram',nz(m.igNow),gd('Instagram','Followers')],['s-amber','Google',nz(m.reviews),gd('Google','Reviews')],
    ['s-teal','Jobs',jobsVal,gd('Jobs','Logged')]]
   :[['s-green','Website','-','upcoming'],['s-blue','Facebook','-',''],['s-purple','Instagram','-',''],['s-amber','Google','-','Reviews'],['s-teal','Jobs','-','']];
  document.getElementById('stats').innerHTML=STAT.map(s=>`<div class="panel stat ${s[0]}"><div class="ph">${s[1]}</div><div class="v">${s[2]}</div><div class="d">${s[3]}</div></div>`).join('');
